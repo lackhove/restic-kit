@@ -91,3 +91,57 @@ func TestCLIWaitOnline(t *testing.T) {
 		t.Errorf("Expected quick completion, took %v", duration)
 	}
 }
+
+func TestCLIAudit(t *testing.T) {
+	// Use the existing test data directory
+	logDir := "tests/restic-logs"
+
+	// Build the binary
+	binaryPath := filepath.Join(os.TempDir(), "restic-kit-test")
+	cmd := exec.Command("go", "build", "-o", binaryPath, ".")
+	cmd.Dir = ".." // Go back to project root
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("Failed to build binary: %v", err)
+	}
+	defer os.Remove(binaryPath)
+
+	// Test audit with default thresholds (should fail due to size changes)
+	cmd = exec.Command(binaryPath, "audit", "--dry-run", logDir)
+	cmd.Dir = ".." // Go back to project root
+	output, err := cmd.CombinedOutput()
+	if err == nil {
+		t.Error("Expected audit to fail with default thresholds, but it passed")
+	}
+
+	// Check that output contains failure information
+	outputStr := string(output)
+	if !contains(outputStr, "Audit FAILED") {
+		t.Errorf("Expected 'Audit FAILED' in output, got: %s", outputStr)
+	}
+	if !contains(outputStr, "size_shrink") {
+		t.Errorf("Expected size_shrink violations in output, got: %s", outputStr)
+	}
+
+	// Test audit with higher thresholds (should pass)
+	cmd = exec.Command(binaryPath, "audit", "--dry-run", "--shrink-threshold", "20", "--grow-threshold", "50", logDir)
+	cmd.Dir = ".." // Go back to project root
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		t.Errorf("Expected audit to pass with higher thresholds, but failed: %v, output: %s", err, outputStr)
+	}
+
+	// Check that output contains success message
+	outputStr = string(output)
+	if !contains(outputStr, "Audit PASSED") {
+		t.Errorf("Expected 'Audit PASSED' in output, got: %s", outputStr)
+	}
+}
+
+func contains(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}

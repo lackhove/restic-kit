@@ -22,6 +22,7 @@ func main() {
 	rootCmd.AddCommand(actions.NewNotifyHTTPCmd())
 	rootCmd.AddCommand(actions.NewWaitOnlineCmd())
 	rootCmd.AddCommand(actions.NewCleanupCmd())
+	rootCmd.AddCommand(actions.NewAuditCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

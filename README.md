@@ -73,6 +73,44 @@ restic-kit wait-online \
 - `--initial-delay`: Initial delay between retries (default: 1s)
 - `--max-delay`: Maximum delay between retries (default: 30s)
 
+### audit
+
+Audit restic snapshots for size anomalies and retention policy compliance. Checks for unusual size changes between the two most recent snapshots per path and verifies snapshot counts against retention policies. Sends email notifications for any failures.
+
+```bash
+restic-kit audit /path/to/logs \
+  --grow-threshold 20.0 \
+  --shrink-threshold 5.0 \
+  --keep-daily 7 \
+  --smtp-host smtp.gmail.com \
+  --smtp-port 587 \
+  --smtp-username your-email@gmail.com \
+  --smtp-password "your-app-password" \
+  --from your-email@gmail.com \
+  --to recipient@example.com
+```
+
+**Options:**
+- `--grow-threshold`: Maximum allowed growth percentage between snapshots (default: 20.0)
+- `--shrink-threshold`: Maximum allowed shrink percentage between snapshots (default: 5.0)
+- `--keep-hourly`: Number of hourly snapshots to keep
+- `--keep-daily`: Number of daily snapshots to keep
+- `--keep-weekly`: Number of weekly snapshots to keep
+- `--keep-monthly`: Number of monthly snapshots to keep
+- `--keep-yearly`: Number of yearly snapshots to keep
+- `--smtp-host`: SMTP server hostname (for email notifications)
+- `--smtp-port`: SMTP server port (default: 587)
+- `--smtp-username`: SMTP username (for email notifications)
+- `--smtp-password`: SMTP password (for email notifications)
+- `--from`: From email address (for email notifications)
+- `--to`: To email address (for email notifications)
+
+The command performs two types of checks:
+1. **Size Change Detection**: Compares the two most recent snapshots per backup path for unusual size changes
+2. **Retention Policy Validation**: Verifies snapshot counts against configured retention policies (hourly/daily/weekly/monthly/yearly)
+
+If any checks fail and email configuration is provided, a detailed email report is sent with violation details.
+
 ## Restic Integration and Bash orchestration
 
 Use restic-kit in your restic backup commands. This repository contains a tiny, example Bash runner (`backup.sh`) that demonstrates how to combine the provided helpers and the CLI into simple, repeatable backup flows. The scripts are intentionally minimal so you can adapt them to your environment.

@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [ main, master ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main, master ]
 
@@ -84,8 +85,56 @@ jobs:
         go build -v -o "${binary_name}" .
         echo "BINARY_NAME=${binary_name}" >> $GITHUB_ENV
 
-    - name: Upload binary
+    - name: Create release archive
+      run: |
+        # Create a directory for the release files
+        mkdir -p release-files
+
+        # Copy files to release directory
+        cp ${{ env.BINARY_NAME }} release-files/
+        cp README.md release-files/
+        cp LICENSE release-files/
+        cp backup.sh release-files/
+
+        # Make binary executable (important for Unix-like systems)
+        if [ "${{ matrix.goos }}" != "windows" ]; then
+          chmod +x release-files/${{ env.BINARY_NAME }}
+        fi
+
+        # Create ZIP archive
+        zip -r "restic-kit-${{ matrix.name }}.zip" release-files/
+
+        # Clean up
+        rm -rf release-files
+
+    - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
-        name: restic-kit-${{ matrix.name }}
+        name: restic-kit-${{ matrix.name }}-binary
         path: ${{ env.BINARY_NAME }}
+
+    - name: Upload release archive
+      uses: actions/upload-artifact@v4
+      with:
+        name: restic-kit-${{ matrix.name }}-release
+        path: restic-kit-${{ matrix.name }}.zip
+
+  release:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - name: Download all release artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: artifacts/**/restic-kit-*-release/restic-kit-*.zip
+        generate_release_notes: true
+        draft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,1032 @@
+[
+    {
+        "group_key": {
+            "hostname": "",
+            "paths": [
+                "/var/mnt/datenhaufen/pictures"
+            ],
+            "tags": null
+        },
+        "snapshots": [
+            {
+                "time": "2025-10-30T02:34:19.509674334+01:00",
+                "tree": "418e19de3c89d1077a9509aab2fb1412d240103bbbb5d2e2721d087b4f2bd885",
+                "paths": [
+                    "/var/mnt/datenhaufen/pictures"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-30T02:34:19.509674334+01:00",
+                    "backup_end": "2025-10-30T02:34:26.32781665+01:00",
+                    "files_new": 2,
+                    "files_changed": 0,
+                    "files_unmodified": 0,
+                    "dirs_new": 4,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 0,
+                    "data_blobs": 1,
+                    "tree_blobs": 5,
+                    "data_added": 2655,
+                    "data_added_packed": 1968,
+                    "total_files_processed": 2,
+                    "total_bytes_processed": 34
+                },
+                "id": "5a4b9dd81c08efa6cb0de2cbf66082d6236088f118386864cfc28752a71930a0",
+                "short_id": "5a4b9dd8"
+            },
+            {
+                "time": "2025-10-31T02:34:26.634687269+01:00",
+                "parent": "5a4b9dd81c08efa6cb0de2cbf66082d6236088f118386864cfc28752a71930a0",
+                "tree": "418e19de3c89d1077a9509aab2fb1412d240103bbbb5d2e2721d087b4f2bd885",
+                "paths": [
+                    "/var/mnt/datenhaufen/pictures"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T02:34:26.634687269+01:00",
+                    "backup_end": "2025-10-31T02:34:30.112456209+01:00",
+                    "files_new": 0,
+                    "files_changed": 0,
+                    "files_unmodified": 2,
+                    "dirs_new": 0,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 4,
+                    "data_blobs": 0,
+                    "tree_blobs": 0,
+                    "data_added": 0,
+                    "data_added_packed": 0,
+                    "total_files_processed": 2,
+                    "total_bytes_processed": 34
+                },
+                "id": "7ef517d2493cf07f31ea250cf4c6a20a7bf01b98243713116b236179303194d5",
+                "short_id": "7ef517d2"
+            }
+        ]
+    },
+    {
+        "group_key": {
+            "hostname": "",
+            "paths": [
+                "/etc",
+                "/var/lib/docker-confs/restic"
+            ],
+            "tags": null
+        },
+        "snapshots": [
+            {
+                "time": "2025-10-27T20:21:56.704807918+01:00",
+                "tree": "0d821b70909c90e56ff6a76b702124f1e15e8163e41f354d4607fdfaac5560c0",
+                "paths": [
+                    "/etc",
+                    "/var/lib/docker-confs/restic"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-27T20:21:56.704807918+01:00",
+                    "backup_end": "2025-10-27T20:22:01.915143986+01:00",
+                    "files_new": 303,
+                    "files_changed": 0,
+                    "files_unmodified": 0,
+                    "dirs_new": 168,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 0,
+                    "data_blobs": 5,
+                    "tree_blobs": 6,
+                    "data_added": 48654,
+                    "data_added_packed": 18976,
+                    "total_files_processed": 303,
+                    "total_bytes_processed": 24586902
+                },
+                "id": "96918b67d5512230fbf65bd92871de62c86bc78fd5b459b09d45f4b1543791a3",
+                "short_id": "96918b67"
+            }
+        ]
+    },
+    {
+        "group_key": {
+            "hostname": "",
+            "paths": [
+                "/var/lib/docker-confs"
+            ],
+            "tags": null
+        },
+        "snapshots": [
+            {
+                "time": "2025-10-27T22:58:12.967835683+01:00",
+                "tree": "17092945f8d5d16445d05a0e85399ab0c25a430a4a219c872f2cbd31bb9fdb99",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-27T22:58:12.967835683+01:00",
+                    "backup_end": "2025-10-27T23:11:17.518565588+01:00",
+                    "files_new": 34834,
+                    "files_changed": 0,
+                    "files_unmodified": 0,
+                    "dirs_new": 4612,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 0,
+                    "data_blobs": 40319,
+                    "tree_blobs": 4476,
+                    "data_added": 11884085514,
+                    "data_added_packed": 3285830700,
+                    "total_files_processed": 34834,
+                    "total_bytes_processed": 12295220027
+                },
+                "id": "102bdc82dc0ea0133e9758816b2b6e282c04b0e44d843d640d125fed9d4d2815",
+                "short_id": "102bdc82"
+            },
+            {
+                "time": "2025-10-28T02:30:46.556010617+01:00",
+                "parent": "102bdc82dc0ea0133e9758816b2b6e282c04b0e44d843d640d125fed9d4d2815",
+                "tree": "259415a094c8dcc2f1c1297c8b1a12f84e39da2a093e4034d1b0f6278b999a9c",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-28T02:30:46.556010617+01:00",
+                    "backup_end": "2025-10-28T02:31:04.971313756+01:00",
+                    "files_new": 16,
+                    "files_changed": 602,
+                    "files_unmodified": 34190,
+                    "dirs_new": 2,
+                    "dirs_changed": 203,
+                    "dirs_unmodified": 4393,
+                    "data_blobs": 155,
+                    "tree_blobs": 203,
+                    "data_added": 104662703,
+                    "data_added_packed": 24873751,
+                    "total_files_processed": 34808,
+                    "total_bytes_processed": 12264045407
+                },
+                "id": "1ede79702bc474e50b35f793220e8c87b65d8b26d0c4334e7f12c11dccea1d3c",
+                "short_id": "1ede7970"
+            },
+            {
+                "time": "2025-10-28T18:31:53.62076035+01:00",
+                "parent": "1ede79702bc474e50b35f793220e8c87b65d8b26d0c4334e7f12c11dccea1d3c",
+                "tree": "1bc64a8eb32c480407903c953b11f20b685358186cf57b1a75499abe28b7b676",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-28T18:31:53.62076035+01:00",
+                    "backup_end": "2025-10-28T18:32:45.561865342+01:00",
+                    "files_new": 18,
+                    "files_changed": 141,
+                    "files_unmodified": 34650,
+                    "dirs_new": 0,
+                    "dirs_changed": 69,
+                    "dirs_unmodified": 4529,
+                    "data_blobs": 524,
+                    "tree_blobs": 70,
+                    "data_added": 407470219,
+                    "data_added_packed": 167735531,
+                    "total_files_processed": 34809,
+                    "total_bytes_processed": 12381062729
+                },
+                "id": "d023e13e40b45d4f5ce7d70f4e1972486b61648f057617e2c7b41f77a0b5047b",
+                "short_id": "d023e13e"
+            },
+            {
+                "time": "2025-10-29T00:10:46.514153691+01:00",
+                "parent": "d023e13e40b45d4f5ce7d70f4e1972486b61648f057617e2c7b41f77a0b5047b",
+                "tree": "f17781af2a43a6ded72dbcc433f1d3c18aab0c2edfe9c9c91e73bc67fb7cb3c6",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-29T00:10:46.514153691+01:00",
+                    "backup_end": "2025-10-29T00:11:53.47353839+01:00",
+                    "files_new": 20,
+                    "files_changed": 8270,
+                    "files_unmodified": 26507,
+                    "dirs_new": 1,
+                    "dirs_changed": 1427,
+                    "dirs_unmodified": 3170,
+                    "data_blobs": 564,
+                    "tree_blobs": 1314,
+                    "data_added": 328410840,
+                    "data_added_packed": 91114089,
+                    "total_files_processed": 34797,
+                    "total_bytes_processed": 10195871936
+                },
+                "id": "625d886a914c40a1ddef3d55d6afab54ab4dda0840aced232b6e695e861a70ab",
+                "short_id": "625d886a"
+            },
+            {
+                "time": "2025-10-30T02:31:22.986483519+01:00",
+                "parent": "625d886a914c40a1ddef3d55d6afab54ab4dda0840aced232b6e695e861a70ab",
+                "tree": "ee2d631ce59c11e33935f19c2b33d7d0c49b77efc216ef39eab1914354d9d2fc",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-30T02:31:22.986483519+01:00",
+                    "backup_end": "2025-10-30T02:32:38.43883504+01:00",
+                    "files_new": 32,
+                    "files_changed": 4044,
+                    "files_unmodified": 30706,
+                    "dirs_new": 6,
+                    "dirs_changed": 682,
+                    "dirs_unmodified": 3899,
+                    "data_blobs": 1191,
+                    "tree_blobs": 675,
+                    "data_added": 714748295,
+                    "data_added_packed": 226435164,
+                    "total_files_processed": 34782,
+                    "total_bytes_processed": 10235378249
+                },
+                "id": "1916297b22a2a5184e2ae68b5abedd29f7f5b724b574e26bd92fb276145a9512",
+                "short_id": "1916297b"
+            },
+            {
+                "time": "2025-10-30T23:30:36.750003013+01:00",
+                "parent": "1916297b22a2a5184e2ae68b5abedd29f7f5b724b574e26bd92fb276145a9512",
+                "tree": "eb56c3610277242811fb81c42c02bbf059ab954ab31b4249ff545806f9f37f3c",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-30T23:30:36.750003013+01:00",
+                    "backup_end": "2025-10-30T23:31:58.280705623+01:00",
+                    "files_new": 21,
+                    "files_changed": 152,
+                    "files_unmodified": 34614,
+                    "dirs_new": 0,
+                    "dirs_changed": 76,
+                    "dirs_unmodified": 4511,
+                    "data_blobs": 815,
+                    "tree_blobs": 77,
+                    "data_added": 536384562,
+                    "data_added_packed": 176228062,
+                    "total_files_processed": 34787,
+                    "total_bytes_processed": 10273357409
+                },
+                "id": "ef06a66746bcc2b6ad51927d596cc8cd3e2dba8015f3fd037ab247b2d6aa2659",
+                "short_id": "ef06a667"
+            },
+            {
+                "time": "2025-10-30T23:34:19.837365014+01:00",
+                "parent": "ef06a66746bcc2b6ad51927d596cc8cd3e2dba8015f3fd037ab247b2d6aa2659",
+                "tree": "1115cdfda7a716e232d54d197d6f905d7ce0bfd538d1f0d7cb4bfe4927dbd518",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-30T23:34:19.837365014+01:00",
+                    "backup_end": "2025-10-30T23:34:37.098246466+01:00",
+                    "files_new": 3,
+                    "files_changed": 25,
+                    "files_unmodified": 34762,
+                    "dirs_new": 0,
+                    "dirs_changed": 30,
+                    "dirs_unmodified": 4557,
+                    "data_blobs": 93,
+                    "tree_blobs": 31,
+                    "data_added": 61667493,
+                    "data_added_packed": 18080410,
+                    "total_files_processed": 34790,
+                    "total_bytes_processed": 10277766537
+                },
+                "id": "a3ccf5e72bcd2de5aea7f50e727bfe404ca497722f0f92bdd1f349752346bac5",
+                "short_id": "a3ccf5e7"
+            },
+            {
+                "time": "2025-10-31T02:31:57.192680545+01:00",
+                "parent": "a3ccf5e72bcd2de5aea7f50e727bfe404ca497722f0f92bdd1f349752346bac5",
+                "tree": "f9eade288e7411d0f0c6d6cca301485cad89af479267f8b12022acb469eef994",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T02:31:57.192680545+01:00",
+                    "backup_end": "2025-10-31T02:33:02.288951277+01:00",
+                    "files_new": 17,
+                    "files_changed": 1790,
+                    "files_unmodified": 32956,
+                    "dirs_new": 4,
+                    "dirs_changed": 324,
+                    "dirs_unmodified": 4250,
+                    "data_blobs": 412,
+                    "tree_blobs": 317,
+                    "data_added": 247724530,
+                    "data_added_packed": 74034617,
+                    "total_files_processed": 34763,
+                    "total_bytes_processed": 10262137656
+                },
+                "id": "919ee3b2a5b1d207b84628ce3ff1a83a271ed92d1ee1ac2e40d3615fc61b254d",
+                "short_id": "919ee3b2"
+            },
+            {
+                "time": "2025-10-31T07:24:16.048991313+01:00",
+                "parent": "919ee3b2a5b1d207b84628ce3ff1a83a271ed92d1ee1ac2e40d3615fc61b254d",
+                "tree": "6f927ccdb1c8308ac511cc37f8175482f99395afa8c33022639155ff896f8dd7",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T07:24:16.048991313+01:00",
+                    "backup_end": "2025-10-31T07:24:47.55062917+01:00",
+                    "files_new": 16,
+                    "files_changed": 113,
+                    "files_unmodified": 34637,
+                    "dirs_new": 0,
+                    "dirs_changed": 67,
+                    "dirs_unmodified": 4511,
+                    "data_blobs": 339,
+                    "tree_blobs": 68,
+                    "data_added": 205021664,
+                    "data_added_packed": 67348989,
+                    "total_files_processed": 34766,
+                    "total_bytes_processed": 10278091823
+                },
+                "id": "eb0fbadbc6bfb5bafa413b408c19a5507f1871eb8dc393dcdbf33ac19cbcec2c",
+                "short_id": "eb0fbadb"
+            },
+            {
+                "time": "2025-10-31T14:36:24.705382665+01:00",
+                "parent": "eb0fbadbc6bfb5bafa413b408c19a5507f1871eb8dc393dcdbf33ac19cbcec2c",
+                "tree": "d052888fdd426b0c8be000bac811c61cbb87452ebfcf7ec373a866ebbc829eca",
+                "paths": [
+                    "/var/lib/docker-confs"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/jellyfin/cache",
+                    "/var/lib/docker-confs/jellyfin/config/metadata/",
+                    "/var/lib/docker-confs/influxdb/data/home_assistant/",
+                    "/var/lib/docker-confs/home-assistant/home-assistant*.db",
+                    "/var/lib/docker-confs/superdup/preference-dirs/*/cache/",
+                    "/var/lib/docker-confs/superdup/",
+                    "/var/lib/docker-confs/lidarr/MediaCover/",
+                    "/var/lib/docker-confs/nextcloud-redis/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T14:36:24.705382665+01:00",
+                    "backup_end": "2025-10-31T14:37:08.690021379+01:00",
+                    "files_new": 11,
+                    "files_changed": 116,
+                    "files_unmodified": 34635,
+                    "dirs_new": 0,
+                    "dirs_changed": 62,
+                    "dirs_unmodified": 4516,
+                    "data_blobs": 704,
+                    "tree_blobs": 63,
+                    "data_added": 457983857,
+                    "data_added_packed": 154470709,
+                    "total_files_processed": 34762,
+                    "total_bytes_processed": 10309179171
+                },
+                "id": "bc04992ae1b84bb14fc27fb62665fc16dcde2cb22fe5644da8fa25dda4590c1a",
+                "short_id": "bc04992a"
+            }
+        ]
+    },
+    {
+        "group_key": {
+            "hostname": "",
+            "paths": [
+                "/var/lib/docker-confs/restic"
+            ],
+            "tags": null
+        },
+        "snapshots": [
+            {
+                "time": "2025-10-27T20:30:27.407071393+01:00",
+                "parent": "96918b67d5512230fbf65bd92871de62c86bc78fd5b459b09d45f4b1543791a3",
+                "tree": "c59e5667afa33d22a45b8faeb6797e79434d76811007f79a4175dd6eacf94693",
+                "paths": [
+                    "/var/lib/docker-confs/restic"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/resticprofile/README.md"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-27T20:30:27.407071393+01:00",
+                    "backup_end": "2025-10-27T20:30:31.715275337+01:00",
+                    "files_new": 0,
+                    "files_changed": 1,
+                    "files_unmodified": 4,
+                    "dirs_new": 0,
+                    "dirs_changed": 4,
+                    "dirs_unmodified": 3,
+                    "data_blobs": 1,
+                    "tree_blobs": 5,
+                    "data_added": 6483,
+                    "data_added_packed": 3270,
+                    "total_files_processed": 5,
+                    "total_bytes_processed": 42430
+                },
+                "id": "0dfb1fabe4fe8ca6cd9067c15ff3d86ef2d332289bf029b6216d0b1545e0feca",
+                "short_id": "0dfb1fab"
+            },
+            {
+                "time": "2025-10-27T20:33:17.615627424+01:00",
+                "parent": "0dfb1fabe4fe8ca6cd9067c15ff3d86ef2d332289bf029b6216d0b1545e0feca",
+                "tree": "0859c45437a334bb3cf0059dd7b889db8a89cce7f1847eec13073e1d573a7bc3",
+                "paths": [
+                    "/var/lib/docker-confs/restic"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/lib/docker-confs/restic/resticprofile/README.md"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-27T20:33:17.615627424+01:00",
+                    "backup_end": "2025-10-27T20:33:21.470297202+01:00",
+                    "files_new": 0,
+                    "files_changed": 1,
+                    "files_unmodified": 3,
+                    "dirs_new": 0,
+                    "dirs_changed": 5,
+                    "dirs_unmodified": 2,
+                    "data_blobs": 1,
+                    "tree_blobs": 6,
+                    "data_added": 6951,
+                    "data_added_packed": 3652,
+                    "total_files_processed": 4,
+                    "total_bytes_processed": 37241
+                },
+                "id": "0a468a010685696f20f5f12205323de95d60fc8c6f881da7fc09dfbd5354c78f",
+                "short_id": "0a468a01"
+            }
+        ]
+    },
+    {
+        "group_key": {
+            "hostname": "",
+            "paths": [
+                "/etc"
+            ],
+            "tags": null
+        },
+        "snapshots": [
+            {
+                "time": "2025-10-26T20:48:03.369115015+01:00",
+                "tree": "f2c30cf6185708eaf5a52411fc69f21dacce0d3751f62616c3604f001c113351",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-26T20:48:03.369115015+01:00",
+                    "backup_end": "2025-10-26T20:48:09.957224871+01:00",
+                    "files_new": 296,
+                    "files_changed": 0,
+                    "files_unmodified": 0,
+                    "dirs_new": 159,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 0,
+                    "data_blobs": 299,
+                    "tree_blobs": 95,
+                    "data_added": 24793826,
+                    "data_added_packed": 3771340,
+                    "total_files_processed": 296,
+                    "total_bytes_processed": 24543612
+                },
+                "id": "2ddcf2591177fb49ed16ba1904842838ae65ff79e659575b483a68de722647f7",
+                "short_id": "2ddcf259"
+            },
+            {
+                "time": "2025-10-27T22:57:54.068740954+01:00",
+                "parent": "c0e30ec975de455db2991bf1b99a72bb9b0d1d70418d09f2b5e22dd9022980ed",
+                "tree": "f003bd7f89bf3d093377d75e6e0c8342e63ef38d30222bd79b3829a50f706eb9",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-27T22:57:54.068740954+01:00",
+                    "backup_end": "2025-10-27T22:57:58.947777814+01:00",
+                    "files_new": 2,
+                    "files_changed": 0,
+                    "files_unmodified": 296,
+                    "dirs_new": 2,
+                    "dirs_changed": 4,
+                    "dirs_unmodified": 155,
+                    "data_blobs": 2,
+                    "tree_blobs": 5,
+                    "data_added": 88830,
+                    "data_added_packed": 15100,
+                    "total_files_processed": 298,
+                    "total_bytes_processed": 24544290
+                },
+                "id": "a28f235c2df9e393a74aad1edbcd40bdc367860276d443cbea77d99c486caf82",
+                "short_id": "a28f235c"
+            },
+            {
+                "time": "2025-10-28T18:31:28.41155122+01:00",
+                "parent": "be78a429c347db08e07b634ab39d4d32734d830498c05ed2ae91913068415d9b",
+                "tree": "f3bd0b106dda7d86a8a6d85edb6478a01a8ce42519c6ecfecf035aaac6714d96",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-28T18:31:28.41155122+01:00",
+                    "backup_end": "2025-10-28T18:31:32.798126333+01:00",
+                    "files_new": 0,
+                    "files_changed": 1,
+                    "files_unmodified": 297,
+                    "dirs_new": 0,
+                    "dirs_changed": 1,
+                    "dirs_unmodified": 160,
+                    "data_blobs": 1,
+                    "tree_blobs": 2,
+                    "data_added": 59562,
+                    "data_added_packed": 10308,
+                    "total_files_processed": 298,
+                    "total_bytes_processed": 24544289
+                },
+                "id": "7e6cf93e7d4e9acd996437f70c82a0fafeeea5d14a04694f2ffd212d0d76e2bb",
+                "short_id": "7e6cf93e"
+            },
+            {
+                "time": "2025-10-29T00:10:24.215627202+01:00",
+                "parent": "7e6cf93e7d4e9acd996437f70c82a0fafeeea5d14a04694f2ffd212d0d76e2bb",
+                "tree": "2e1aa4820491ef16795e004e016d491a8fc50fa5516e0a8abee32f2aaa275242",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-29T00:10:24.215627202+01:00",
+                    "backup_end": "2025-10-29T00:10:30.436844553+01:00",
+                    "files_new": 0,
+                    "files_changed": 62,
+                    "files_unmodified": 236,
+                    "dirs_new": 0,
+                    "dirs_changed": 161,
+                    "dirs_unmodified": 0,
+                    "data_blobs": 21,
+                    "tree_blobs": 94,
+                    "data_added": 10011155,
+                    "data_added_packed": 1090789,
+                    "total_files_processed": 298,
+                    "total_bytes_processed": 24547448
+                },
+                "id": "aab151fea55738fe9a230a12ca9abb601e7a5e7614ddced83e85795f2d99c96e",
+                "short_id": "aab151fe"
+            },
+            {
+                "time": "2025-10-30T23:34:14.515777695+01:00",
+                "parent": "375163040934a7a14a2f6192c40540426f69fde48f1a4ef2d5b3fd359e7a25a9",
+                "tree": "e78f5200b343443f0e2a3de67b5e8fba96ad1a68a8f147e6490751bb5357f7c7",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-30T23:34:14.515777695+01:00",
+                    "backup_end": "2025-10-30T23:34:19.35394226+01:00",
+                    "files_new": 0,
+                    "files_changed": 0,
+                    "files_unmodified": 298,
+                    "dirs_new": 0,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 161,
+                    "data_blobs": 0,
+                    "tree_blobs": 0,
+                    "data_added": 0,
+                    "data_added_packed": 0,
+                    "total_files_processed": 298,
+                    "total_bytes_processed": 24547619
+                },
+                "id": "466b2bc2f7c46c86a8d01e71853ee42e01c98f83549bfb42f4318ffccdbc85e5",
+                "short_id": "466b2bc2"
+            },
+            {
+                "time": "2025-10-31T02:30:51.952058815+01:00",
+                "parent": "466b2bc2f7c46c86a8d01e71853ee42e01c98f83549bfb42f4318ffccdbc85e5",
+                "tree": "e78f5200b343443f0e2a3de67b5e8fba96ad1a68a8f147e6490751bb5357f7c7",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T02:30:51.952058815+01:00",
+                    "backup_end": "2025-10-31T02:30:55.713526835+01:00",
+                    "files_new": 0,
+                    "files_changed": 0,
+                    "files_unmodified": 298,
+                    "dirs_new": 0,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 161,
+                    "data_blobs": 0,
+                    "tree_blobs": 0,
+                    "data_added": 0,
+                    "data_added_packed": 0,
+                    "total_files_processed": 298,
+                    "total_bytes_processed": 24547619
+                },
+                "id": "815d47b48ef951f015a0df440a3da63723d9280aecc61ee050492f47bc7f8b38",
+                "short_id": "815d47b4"
+            },
+            {
+                "time": "2025-10-31T07:18:55.147165417+01:00",
+                "parent": "815d47b48ef951f015a0df440a3da63723d9280aecc61ee050492f47bc7f8b38",
+                "tree": "5cdc49a258fdf9d5228a6ed12a7df375522c04a66fed4a20e909bdba834cec23",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T07:18:55.147165417+01:00",
+                    "backup_end": "2025-10-31T07:19:01.393339368+01:00",
+                    "files_new": 2,
+                    "files_changed": 1,
+                    "files_unmodified": 295,
+                    "dirs_new": 0,
+                    "dirs_changed": 4,
+                    "dirs_unmodified": 155,
+                    "data_blobs": 3,
+                    "tree_blobs": 5,
+                    "data_added": 86770,
+                    "data_added_packed": 15117,
+                    "total_files_processed": 298,
+                    "total_bytes_processed": 24547258
+                },
+                "id": "fb2ac85828140ece617ab371569105c896bf8c1858a76ccb8ea4ca5e5e287412",
+                "short_id": "fb2ac858"
+            },
+            {
+                "time": "2025-10-31T07:24:09.953157579+01:00",
+                "parent": "fb2ac85828140ece617ab371569105c896bf8c1858a76ccb8ea4ca5e5e287412",
+                "tree": "30d41a1b48aa8010d25f4f3fa8817e8144312437cab5c961b302d771956c85e4",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T07:24:09.953157579+01:00",
+                    "backup_end": "2025-10-31T07:24:15.423076757+01:00",
+                    "files_new": 1,
+                    "files_changed": 1,
+                    "files_unmodified": 297,
+                    "dirs_new": 0,
+                    "dirs_changed": 4,
+                    "dirs_unmodified": 155,
+                    "data_blobs": 2,
+                    "tree_blobs": 5,
+                    "data_added": 100508,
+                    "data_added_packed": 15984,
+                    "total_files_processed": 299,
+                    "total_bytes_processed": 24559544
+                },
+                "id": "2e4611bff2426c63e4de6d12a38a1b660cdcfa09614ec3f97716be939005d4a1",
+                "short_id": "2e4611bf"
+            },
+            {
+                "time": "2025-10-31T14:36:19.445111511+01:00",
+                "parent": "2e4611bff2426c63e4de6d12a38a1b660cdcfa09614ec3f97716be939005d4a1",
+                "tree": "30d41a1b48aa8010d25f4f3fa8817e8144312437cab5c961b302d771956c85e4",
+                "paths": [
+                    "/etc"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T14:36:19.445111511+01:00",
+                    "backup_end": "2025-10-31T14:36:23.882276515+01:00",
+                    "files_new": 0,
+                    "files_changed": 0,
+                    "files_unmodified": 299,
+                    "dirs_new": 0,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 159,
+                    "data_blobs": 0,
+                    "tree_blobs": 0,
+                    "data_added": 0,
+                    "data_added_packed": 0,
+                    "total_files_processed": 299,
+                    "total_bytes_processed": 24559544
+                },
+                "id": "6cb29f2c53730fde0c6c5044756bc4496f77314773477a34814bcfcfb30bdaaa",
+                "short_id": "6cb29f2c"
+            }
+        ]
+    },
+    {
+        "group_key": {
+            "hostname": "",
+            "paths": [
+                "/var/mnt/datenhaufen/nextcloud_data"
+            ],
+            "tags": null
+        },
+        "snapshots": [
+            {
+                "time": "2025-10-29T00:12:10.279172865+01:00",
+                "tree": "02a1c966142328345a6ced34df7ff16597dabeb914e7957f17831d39a650e188",
+                "paths": [
+                    "/var/mnt/datenhaufen/nextcloud_data"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/mnt/datenhaufen/nextcloud_data/appdata_*/",
+                    "/var/mnt/datenhaufen/nextcloud_data/*/files_trashbin/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-29T00:12:10.279172865+01:00",
+                    "backup_end": "2025-10-29T22:19:17.913125888+01:00",
+                    "files_new": 129888,
+                    "files_changed": 0,
+                    "files_unmodified": 0,
+                    "dirs_new": 13595,
+                    "dirs_changed": 0,
+                    "dirs_unmodified": 0,
+                    "data_blobs": 306554,
+                    "tree_blobs": 12046,
+                    "data_added": 329803828759,
+                    "data_added_packed": 318684632374,
+                    "total_files_processed": 129888,
+                    "total_bytes_processed": 470797840995
+                },
+                "id": "8f9c3cbce96f47e642dc2ebfbd89f1f0f8bdfb5a991469eaed6565eda5c443b1",
+                "short_id": "8f9c3cbc"
+            },
+            {
+                "time": "2025-10-30T23:34:37.521174169+01:00",
+                "parent": "56fd3996c240d5cf8a68fff589594ebfef2debbf63a811d856fc33c794a5ddd8",
+                "tree": "a4648708214ded7419c144d3a25042e1de0a10508569f8f4292c1c0fcdeca083",
+                "paths": [
+                    "/var/mnt/datenhaufen/nextcloud_data"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/mnt/datenhaufen/nextcloud_data/appdata_*",
+                    "/var/mnt/datenhaufen/nextcloud_data/*/files_trashbin/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-30T23:34:37.521174169+01:00",
+                    "backup_end": "2025-10-30T23:34:49.918954748+01:00",
+                    "files_new": 50,
+                    "files_changed": 0,
+                    "files_unmodified": 129431,
+                    "dirs_new": 12,
+                    "dirs_changed": 14,
+                    "dirs_unmodified": 13713,
+                    "data_blobs": 50,
+                    "tree_blobs": 27,
+                    "data_added": 1279478,
+                    "data_added_packed": 241358,
+                    "total_files_processed": 129481,
+                    "total_bytes_processed": 466120320037
+                },
+                "id": "97602f9265e8e76b487b8b591e817ac70bac9c46b2b177614df848def3353934",
+                "short_id": "97602f92"
+            },
+            {
+                "time": "2025-10-31T02:33:26.779266287+01:00",
+                "parent": "97602f9265e8e76b487b8b591e817ac70bac9c46b2b177614df848def3353934",
+                "tree": "0392c307178e06550059741d9bd698f2b40dbbe8ba1446b7b7e1fa2eb7e3e6b9",
+                "paths": [
+                    "/var/mnt/datenhaufen/nextcloud_data"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/mnt/datenhaufen/nextcloud_data/appdata_*/",
+                    "/var/mnt/datenhaufen/nextcloud_data/*/files_trashbin/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T02:33:26.779266287+01:00",
+                    "backup_end": "2025-10-31T02:33:41.502879684+01:00",
+                    "files_new": 28,
+                    "files_changed": 0,
+                    "files_unmodified": 129481,
+                    "dirs_new": 7,
+                    "dirs_changed": 14,
+                    "dirs_unmodified": 13725,
+                    "data_blobs": 28,
+                    "tree_blobs": 22,
+                    "data_added": 1233179,
+                    "data_added_packed": 225340,
+                    "total_files_processed": 129509,
+                    "total_bytes_processed": 466120380859
+                },
+                "id": "4c8a2da5846370af6f6de3cdd3e20e6c68639b236f489a2e3dc30a9264220ce0",
+                "short_id": "4c8a2da5"
+            },
+            {
+                "time": "2025-10-31T07:24:48.608907392+01:00",
+                "parent": "4c8a2da5846370af6f6de3cdd3e20e6c68639b236f489a2e3dc30a9264220ce0",
+                "tree": "f0e27e57137dcc1a339542b6b99cee36a2dab1806fbd55d248e9f6f07a83706b",
+                "paths": [
+                    "/var/mnt/datenhaufen/nextcloud_data"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/mnt/datenhaufen/nextcloud_data/appdata_*",
+                    "/var/mnt/datenhaufen/nextcloud_data/*/files_trashbin/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T07:24:48.608907392+01:00",
+                    "backup_end": "2025-10-31T07:25:03.028208054+01:00",
+                    "files_new": 96,
+                    "files_changed": 76,
+                    "files_unmodified": 129417,
+                    "dirs_new": 8,
+                    "dirs_changed": 120,
+                    "dirs_unmodified": 13626,
+                    "data_blobs": 40,
+                    "tree_blobs": 127,
+                    "data_added": 3018025,
+                    "data_added_packed": 477200,
+                    "total_files_processed": 129589,
+                    "total_bytes_processed": 466130636649
+                },
+                "id": "a3549012502fa6aeda9628bd2fdd0758cba017c89f2080b57d9377fd58343717",
+                "short_id": "a3549012"
+            },
+            {
+                "time": "2025-10-31T14:37:09.30070983+01:00",
+                "parent": "a3549012502fa6aeda9628bd2fdd0758cba017c89f2080b57d9377fd58343717",
+                "tree": "ccfcbd7861d8b91156550a91a3888663d164f48cc3d180222a5c045d51dcb5c4",
+                "paths": [
+                    "/var/mnt/datenhaufen/nextcloud_data"
+                ],
+                "hostname": "datenknecht",
+                "username": "root",
+                "excludes": [
+                    "/var/mnt/datenhaufen/nextcloud_data/appdata_*",
+                    "/var/mnt/datenhaufen/nextcloud_data/*/files_trashbin/"
+                ],
+                "program_version": "restic 0.18.1",
+                "summary": {
+                    "backup_start": "2025-10-31T14:37:09.30070983+01:00",
+                    "backup_end": "2025-10-31T14:37:30.147706899+01:00",
+                    "files_new": 967,
+                    "files_changed": 78,
+                    "files_unmodified": 129472,
+                    "dirs_new": 199,
+                    "dirs_changed": 198,
+                    "dirs_unmodified": 13556,
+                    "data_blobs": 928,
+                    "tree_blobs": 398,
+                    "data_added": 30512398,
+                    "data_added_packed": 17382334,
+                    "total_files_processed": 130517,
+                    "total_bytes_processed": 466160957760
+                },
+                "id": "db72f9a79b1ada2a85f3531edd1c16a6131470392a543e7e9bc0fa9a870337d5",
+                "short_id": "db72f9a7"
+            }
+        ]
+    }
+]

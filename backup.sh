@@ -12,7 +12,7 @@ set -euo pipefail
 
 # Configuration variables
 RESTIC="/usr/local/bin/restic"
-REMOTE_RESTIC="/usr/local/bin/restic"  # Path to restic on source system
+REMOTE_RESTIC_SRC="/usr/local/bin/restic"  # Path to restic on source system
 RESTIC_HOOKS="/usr/local/bin/restic-kit"
 RESTIC_REPOSITORY="s3:s3.us-west-002.backblazeb2.com/my-backup-bucket"
 SSH_HOST="backup-source"  # SSH config host alias for source system
@@ -29,8 +29,26 @@ export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-}"
 # Create temporary directory for logs
 TEMP_DIR=$(mktemp -d)
 
+# Setup remote restic binary
+echo "Setting up restic binary on remote host..."
+REMOTE_RESTIC=$(ssh -p "$SSH_PORT" "$SSH_HOST" "mktemp")
+echo "Created remote temp file: $REMOTE_RESTIC"
+
+# Copy restic binary to remote host
+echo "Copying restic binary to remote host..."
+scp -P "$SSH_PORT" "$REMOTE_RESTIC_SRC" "$SSH_HOST:$REMOTE_RESTIC"
+ssh -p "$SSH_PORT" "$SSH_HOST" "chmod +x $REMOTE_RESTIC"
+
+echo "Using restic binary at: $REMOTE_RESTIC"
+
 # Cleanup function to send email notification and remove temp dir
 cleanup() {
+    # Clean up remote temporary restic binary
+    if [ -n "$REMOTE_RESTIC" ]; then
+        echo "Cleaning up remote temporary restic binary: $REMOTE_RESTIC"
+        ssh -p "$SSH_PORT" "$SSH_HOST" "rm -f $REMOTE_RESTIC" || true
+    fi
+
     # First send email notification with backup summary
     $RESTIC_HOOKS notify-email \
         --smtp-host "smtp.test.com" \

@@ -12,7 +12,7 @@ set -euo pipefail
 
 # Configuration variables
 RESTIC="/usr/local/bin/restic"
-REMOTE_RESTIC_SRC="/usr/local/bin/restic"  # Path to restic on source system
+REMOTE_RESTIC_SRC="/usr/local/bin/restic"  # Path to restic for source system
 RESTIC_HOOKS="/usr/local/bin/restic-kit"
 RESTIC_REPOSITORY="s3:s3.us-west-002.backblazeb2.com/my-backup-bucket"
 SSH_HOST="backup-source"  # SSH config host alias for source system

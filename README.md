@@ -75,13 +75,12 @@ restic-kit wait-online \
 
 ### audit
 
-Audit restic snapshots for size anomalies and retention policy compliance. Checks for unusual size changes between the two most recent snapshots per path and verifies snapshot counts against retention policies. Sends email notifications for any failures.
+Audit restic snapshots for size anomalies. Checks for unusual size changes between the two most recent snapshots per path. Sends email notifications for any failures.
 
 ```bash
 restic-kit audit /path/to/logs \
   --grow-threshold 20.0 \
   --shrink-threshold 5.0 \
-  --keep-daily 7 \
   --smtp-host smtp.gmail.com \
   --smtp-port 587 \
   --smtp-username your-email@gmail.com \

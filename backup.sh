@@ -95,4 +95,18 @@ $RESTIC snapshots \
     --json > "$TEMP_DIR/snapshots.out" 2> "$TEMP_DIR/snapshots.err"
 echo $? > "$TEMP_DIR/snapshots.exitcode"
 
+# Audit snapshots for anomalies
+echo "Auditing snapshots for size anomalies..."
+$RESTIC_HOOKS audit \
+    --grow-threshold 20.0 \
+    --shrink-threshold 5.0 \
+    --smtp-host "smtp.test.com" \
+    --smtp-port 465 \
+    --smtp-username "restic@test.com" \
+    --smtp-password "${RESTIC_HOOKS_EMAIL_PASSWORD}" \
+    --from "restic@test.com" \
+    --to "nobody@gmail.com" \
+    "$TEMP_DIR" > "$TEMP_DIR/audit.out" 2> "$TEMP_DIR/audit.err"
+echo $? > "$TEMP_DIR/audit.exitcode"
+
 echo "Backup process completed successfully."

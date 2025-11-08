@@ -82,7 +82,7 @@ jobs:
         if [ "${{ matrix.goos }}" = "windows" ]; then
           binary_name="restic-kit.exe"
         fi
-        go build -v -o "${binary_name}" .
+        go build -v -o "${binary_name}" ./cmd
         echo "BINARY_NAME=${binary_name}" >> $GITHUB_ENV
 
     - name: Create release archive

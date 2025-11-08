@@ -83,35 +83,17 @@ func generateBodyFromActions(actions []restic.ActionResult, success bool) string
 
 	body.WriteString(fmt.Sprintf("Overall Status: %s\n\n", map[bool]string{true: "SUCCESS", false: "FAILURE"}[success]))
 
-	var backupActions []restic.ActionResult
-	var checkActions []restic.ActionResult
-	var forgetActions []restic.ActionResult
-	var allSnapshots []restic.Snapshot
-
+	// Process actions in execution order
 	for _, action := range actions {
 		switch actionResult := action.(type) {
 		case *restic.BackupActionResult:
-			backupActions = append(backupActions, action)
-		case *restic.CheckActionResult:
-			checkActions = append(checkActions, action)
-		case *restic.SnapshotsActionResult:
-			allSnapshots = append(allSnapshots, actionResult.Snapshots...)
-		case *restic.ForgetActionResult:
-			forgetActions = append(forgetActions, action)
-		}
-	}
-
-	if len(backupActions) > 0 {
-		body.WriteString("Backup Summaries:\n")
-		for _, action := range backupActions {
-			result := action.(*restic.BackupActionResult)
 			statusEmoji := "✅"
-			if !result.Success {
+			if !actionResult.Success {
 				statusEmoji = "❌"
 			}
-			body.WriteString(fmt.Sprintf("\n%s %s:\n", statusEmoji, result.Name))
+			body.WriteString(fmt.Sprintf("%s backup %s\n", statusEmoji, actionResult.Name))
 
-			info := result.GetSummaryInfo()
+			info := actionResult.GetSummaryInfo()
 			body.WriteString(fmt.Sprintf("  Files: %s new, %s changed, %s unmodified\n",
 				info["files_new"], info["files_changed"], info["files_unmodified"]))
 			body.WriteString(fmt.Sprintf("  Directories: %s new, %s changed, %s unmodified\n",
@@ -123,86 +105,107 @@ func generateBodyFromActions(actions []restic.ActionResult, success bool) string
 			if duration, ok := info["duration"]; ok {
 				body.WriteString(fmt.Sprintf("  Duration: %s seconds\n", duration))
 			}
-		}
-	}
+			body.WriteString("\n")
 
-	if len(checkActions) > 0 {
-		body.WriteString("\nRepository Check:\n")
-		for _, action := range checkActions {
-			result := action.(*restic.CheckActionResult)
+		case *restic.CheckActionResult:
 			statusEmoji := "✅"
-			if !result.Success {
+			if !actionResult.Success {
 				statusEmoji = "❌"
 			}
-			info := result.GetSummaryInfo()
-			body.WriteString(fmt.Sprintf("%s %s\n", statusEmoji, info["status"]))
-		}
-	}
+			body.WriteString(fmt.Sprintf("%s check\n", statusEmoji))
+			info := actionResult.GetSummaryInfo()
+			body.WriteString(fmt.Sprintf("  %s\n\n", info["status"]))
 
-	if len(allSnapshots) > 0 {
-		body.WriteString("\n\nRepository Snapshots:\n")
-		body.WriteString(fmt.Sprintf("Total snapshots: %d\n\n", len(allSnapshots)))
+		case *restic.SnapshotsActionResult:
+			body.WriteString(fmt.Sprintf("%s snapshots\n", "✅"))
+			body.WriteString(fmt.Sprintf("  Repository Snapshots: %d\n", len(actionResult.Snapshots)))
 
-		groupedByPath := make(map[string][]restic.Snapshot)
-		for _, snap := range allSnapshots {
-			key := strings.Join(snap.Paths, ", ")
-			groupedByPath[key] = append(groupedByPath[key], snap)
-		}
+			// Group snapshots by paths
+			groupedByPath := make(map[string][]restic.Snapshot)
+			for _, snap := range actionResult.Snapshots {
+				key := strings.Join(snap.Paths, ", ")
+				groupedByPath[key] = append(groupedByPath[key], snap)
+			}
 
-		var paths []string
-		for path := range groupedByPath {
-			paths = append(paths, path)
-		}
-		sort.Strings(paths)
+			// Sort paths alphabetically
+			var paths []string
+			for path := range groupedByPath {
+				paths = append(paths, path)
+			}
+			sort.Strings(paths)
 
-		for _, path := range paths {
-			snaps := groupedByPath[path]
-			body.WriteString(fmt.Sprintf("Path: %s\n", path))
-			body.WriteString(fmt.Sprintf("Snapshots: %d\n", len(snaps)))
-			body.WriteString(fmt.Sprintf("%-20s | %8s | %8s | %12s | %12s | %12s\n", "Date & Time", "New", "Modified", "Total Files", "Added Size", "Total Size"))
-			body.WriteString(fmt.Sprintf("%-20s | %8s | %8s | %12s | %12s | %12s\n", strings.Repeat("-", 20), strings.Repeat("-", 8), strings.Repeat("-", 8), strings.Repeat("-", 12), strings.Repeat("-", 12), strings.Repeat("-", 12)))
-			for _, snap := range snaps {
-				parsedTime, err := time.Parse(time.RFC3339Nano, snap.Time)
-				var timeStr string
-				if err == nil {
-					timeStr = parsedTime.Format("2006-01-02 15:04")
-				} else {
-					timeStr = snap.Time
-					if len(timeStr) > 20 {
-						timeStr = timeStr[:20]
+			for _, path := range paths {
+				snapshots := groupedByPath[path]
+				body.WriteString(fmt.Sprintf("\n  Path: %s\n", path))
+				body.WriteString(fmt.Sprintf("  Snapshots: %d\n", len(snapshots)))
+
+				if len(snapshots) > 0 {
+					body.WriteString("  Date & Time          |      New | Modified |  Total Files |   Added Size |   Total Size\n")
+					body.WriteString("  -------------------- | -------- | -------- | ------------ | ------------ | ------------\n")
+
+					// Sort snapshots by time (newest first)
+					sort.Slice(snapshots, func(i, j int) bool {
+						return snapshots[i].Time > snapshots[j].Time
+					})
+
+					for _, snap := range snapshots {
+						// Parse time for formatting (YYYY-MM-DD HH:MM)
+						timeStr := snap.Time
+						if len(timeStr) >= 16 {
+							timeStr = timeStr[:10] + " " + timeStr[11:16] // YYYY-MM-DD HH:MM
+						}
+
+						// Get summary data
+						newFiles := "0"
+						modifiedFiles := "0"
+						totalFiles := "0"
+						addedSize := "0 B"
+						totalSize := "0 B"
+
+						if snap.Summary.FilesNew > 0 || snap.Summary.FilesChanged > 0 || snap.Summary.FilesUnmodified > 0 {
+							newFiles = fmt.Sprintf("%d", snap.Summary.FilesNew)
+							modifiedFiles = fmt.Sprintf("%d", snap.Summary.FilesChanged)
+							totalFiles = fmt.Sprintf("%d", snap.Summary.TotalFilesProcessed)
+							addedSize = formatBytes(snap.Summary.DataAdded)
+							totalSize = formatBytes(snap.Summary.TotalBytesProcessed)
+						}
+
+						body.WriteString(fmt.Sprintf("  %-20s | %8s | %8s | %12s | %12s | %12s\n",
+							timeStr, newFiles, modifiedFiles, totalFiles, addedSize, totalSize))
 					}
 				}
-				body.WriteString(fmt.Sprintf("%-20s | %8d | %8d | %12d | %12s | %12s\n",
-					timeStr,
-					snap.Summary.FilesNew,
-					snap.Summary.FilesChanged,
-					snap.Summary.TotalFilesProcessed,
-					shared.FormatBytes(snap.Summary.DataAdded),
-					shared.FormatBytes(snap.Summary.TotalBytesProcessed)))
 			}
 			body.WriteString("\n")
-		}
-	}
 
-	if len(forgetActions) > 0 {
-		body.WriteString("\n\nForget Operations:\n")
-		for _, action := range forgetActions {
-			result := action.(*restic.ForgetActionResult)
+		case *restic.ForgetActionResult:
 			statusEmoji := "✅"
-			if !result.Success {
+			if !actionResult.Success {
 				statusEmoji = "❌"
 			}
-			if result.RemovedCount > 0 {
-				body.WriteString(fmt.Sprintf("%s %s: %d snapshots removed\n",
-					statusEmoji, result.Name, result.RemovedCount))
+			body.WriteString(fmt.Sprintf("%s forget\n", statusEmoji))
+			if actionResult.RemovedCount > 0 {
+				body.WriteString(fmt.Sprintf("  %d snapshots removed\n\n", actionResult.RemovedCount))
 			} else {
-				body.WriteString(fmt.Sprintf("%s %s: no snapshots removed\n",
-					statusEmoji, result.Name))
+				body.WriteString("  no snapshots removed\n\n")
 			}
 		}
 	}
 
 	return body.String()
+}
+
+// formatBytes formats bytes into human readable format
+func formatBytes(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%d B", bytes)
+	}
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
 
 // analyzeBackupResults analyzes the backup results from a log directory
@@ -249,6 +252,29 @@ func analyzeBackupResults(logDir string) ([]restic.ActionResult, bool, error) {
 	exitcodeFiles, err := filepath.Glob(filepath.Join(logDir, "*.exitcode"))
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to list exitcode files in %s: %w", logDir, err)
+	}
+
+	// Sort exitcode files by modification time to preserve execution order
+	type fileWithTime struct {
+		path  string
+		mtime time.Time
+	}
+	var filesWithTime []fileWithTime
+	for _, f := range exitcodeFiles {
+		info, err := os.Stat(f)
+		if err != nil {
+			continue
+		}
+		filesWithTime = append(filesWithTime, fileWithTime{path: f, mtime: info.ModTime()})
+	}
+	sort.Slice(filesWithTime, func(i, j int) bool {
+		return filesWithTime[i].mtime.Before(filesWithTime[j].mtime)
+	})
+
+	// Extract sorted file paths
+	exitcodeFiles = make([]string, len(filesWithTime))
+	for i, f := range filesWithTime {
+		exitcodeFiles[i] = f.path
 	}
 
 	var actions []restic.ActionResult

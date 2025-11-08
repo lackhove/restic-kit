@@ -20,6 +20,8 @@ Configuration is provided via command-line parameters for each subcommand.
 
 Send an email notification with backup report details from JSON logs in a directory. The command parses JSON logs from the directory and generates a formatted email with backup summaries, snapshot tables, error attachments, and repository check status.
 
+**Execution Order**: Email summaries are displayed in chronological order based on the modification time of the exitcode files, ensuring the email reflects the actual sequence of backup operations (backup → check → snapshots → forget).
+
 ### notify-http
 
 Perform a single HTTP GET request to notify an external service.

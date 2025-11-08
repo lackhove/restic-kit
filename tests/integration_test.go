@@ -36,7 +36,7 @@ func TestCLINotifyHTTP(t *testing.T) {
 
 	// Build the binary
 	binaryPath := filepath.Join(os.TempDir(), "restic-kit-test")
-	cmd := exec.Command("go", "build", "-o", binaryPath, ".")
+	cmd := exec.Command("go", "build", "-o", binaryPath, "./cmd")
 	cmd.Dir = ".." // Go back to project root
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("Failed to build binary: %v", err)
@@ -65,7 +65,7 @@ func TestCLIWaitOnline(t *testing.T) {
 
 	// Build the binary
 	binaryPath := filepath.Join(os.TempDir(), "restic-kit-test")
-	cmd := exec.Command("go", "build", "-o", binaryPath, ".")
+	cmd := exec.Command("go", "build", "-o", binaryPath, "./cmd")
 	cmd.Dir = ".." // Go back to project root
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("Failed to build binary: %v", err)
@@ -98,7 +98,7 @@ func TestCLIAudit(t *testing.T) {
 
 	// Build the binary
 	binaryPath := filepath.Join(os.TempDir(), "restic-kit-test")
-	cmd := exec.Command("go", "build", "-o", binaryPath, ".")
+	cmd := exec.Command("go", "build", "-o", binaryPath, "./cmd")
 	cmd.Dir = ".." // Go back to project root
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("Failed to build binary: %v", err)

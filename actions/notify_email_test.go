@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"restic-kit/shared"
 )
 
 func TestNotifyEmailAction(t *testing.T) {
@@ -31,7 +33,7 @@ func TestNotifyEmailAction(t *testing.T) {
 	os.WriteFile(tmpDir+"/snapshots.out", []byte(snapshotsOut), 0644)
 
 	// Create email config (using a fake SMTP server for testing)
-	emailConfig := &NotifyEmailConfig{
+	emailConfig := &shared.NotifyEmailConfig{
 		SMTPHost:     "localhost",
 		SMTPPort:     2525, // Use a port that won't conflict
 		SMTPUsername: "test",
@@ -99,7 +101,7 @@ func TestNotifyEmailActionDryRun(t *testing.T) {
 	os.WriteFile(tmpDir+"/snapshots.out", []byte(snapshotsOut), 0644)
 
 	// Create email config
-	emailConfig := &NotifyEmailConfig{
+	emailConfig := &shared.NotifyEmailConfig{
 		SMTPHost:     "localhost",
 		SMTPPort:     2525,
 		SMTPUsername: "test",
@@ -151,13 +153,13 @@ func TestNotifyEmailActionDryRun(t *testing.T) {
 func TestValidateNotifyEmailConfig(t *testing.T) {
 	tests := []struct {
 		name    string
-		config  *NotifyEmailConfig
+		config  *shared.NotifyEmailConfig
 		wantErr bool
 		errMsg  string
 	}{
 		{
 			name: "valid config",
-			config: &NotifyEmailConfig{
+			config: &shared.NotifyEmailConfig{
 				SMTPHost:     "smtp.example.com",
 				SMTPPort:     587,
 				SMTPUsername: "user",
@@ -169,7 +171,7 @@ func TestValidateNotifyEmailConfig(t *testing.T) {
 		},
 		{
 			name: "missing smtp-host",
-			config: &NotifyEmailConfig{
+			config: &shared.NotifyEmailConfig{
 				SMTPUsername: "user",
 				SMTPPassword: "pass",
 				From:         "from@example.com",
@@ -180,7 +182,7 @@ func TestValidateNotifyEmailConfig(t *testing.T) {
 		},
 		{
 			name: "missing from",
-			config: &NotifyEmailConfig{
+			config: &shared.NotifyEmailConfig{
 				SMTPHost:     "smtp.example.com",
 				SMTPUsername: "user",
 				SMTPPassword: "pass",
@@ -191,7 +193,7 @@ func TestValidateNotifyEmailConfig(t *testing.T) {
 		},
 		{
 			name: "missing to",
-			config: &NotifyEmailConfig{
+			config: &shared.NotifyEmailConfig{
 				SMTPHost:     "smtp.example.com",
 				SMTPUsername: "user",
 				SMTPPassword: "pass",
@@ -202,7 +204,7 @@ func TestValidateNotifyEmailConfig(t *testing.T) {
 		},
 		{
 			name: "missing smtp-username",
-			config: &NotifyEmailConfig{
+			config: &shared.NotifyEmailConfig{
 				SMTPHost:     "smtp.example.com",
 				SMTPPassword: "pass",
 				From:         "from@example.com",
@@ -213,7 +215,7 @@ func TestValidateNotifyEmailConfig(t *testing.T) {
 		},
 		{
 			name: "missing smtp-password",
-			config: &NotifyEmailConfig{
+			config: &shared.NotifyEmailConfig{
 				SMTPHost:     "smtp.example.com",
 				SMTPUsername: "user",
 				From:         "from@example.com",
@@ -226,12 +228,12 @@ func TestValidateNotifyEmailConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateNotifyEmailConfig(tt.config)
+			err := shared.ValidateNotifyEmailConfig(tt.config)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateNotifyEmailConfig() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Validate	shared.NotifyEmailConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.wantErr && err != nil && err.Error() != tt.errMsg {
-				t.Errorf("ValidateNotifyEmailConfig() error = %v, want %v", err.Error(), tt.errMsg)
+				t.Errorf("Validate	shared.NotifyEmailConfig() error = %v, want %v", err.Error(), tt.errMsg)
 			}
 		})
 	}

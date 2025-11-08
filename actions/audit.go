@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -19,11 +18,6 @@ import (
 type AuditConfig struct {
 	GrowThreshold   float64
 	ShrinkThreshold float64
-	KeepHourly      int
-	KeepDaily       int
-	KeepWeekly      int
-	KeepMonthly     int
-	KeepYearly      int
 	*shared.NotifyEmailConfig
 }
 
@@ -81,10 +75,6 @@ func (a *AuditAction) Execute(args []string, dryRun bool) error {
 	// Check size changes
 	sizeViolations := a.checkSizeChanges(snapshots)
 	failedChecks = append(failedChecks, sizeViolations...)
-
-	// Check retention policy
-	retentionViolations := a.checkRetentionPolicy(snapshots)
-	failedChecks = append(failedChecks, retentionViolations...)
 
 	// Send email if there are failures and email config is provided
 	if len(failedChecks) > 0 && a.config.NotifyEmailConfig != nil {
@@ -179,95 +169,6 @@ func (a *AuditAction) checkSizeChanges(snapshots []restic.Snapshot) []AuditCheck
 	return violations
 }
 
-func (a *AuditAction) checkRetentionPolicy(snapshots []restic.Snapshot) []AuditCheckResult {
-	var violations []AuditCheckResult
-
-	// Group snapshots by path
-	groupedByPath := make(map[string][]restic.Snapshot)
-	for _, snap := range snapshots {
-		key := strings.Join(snap.Paths, ", ")
-		groupedByPath[key] = append(groupedByPath[key], snap)
-	}
-
-	for path, snaps := range groupedByPath {
-		// Parse times and sort
-		type snapshotWithTime struct {
-			snapshot restic.Snapshot
-			time     time.Time
-		}
-
-		var snapsWithTime []snapshotWithTime
-		for _, snap := range snaps {
-			t, err := time.Parse(time.RFC3339Nano, snap.Time)
-			if err != nil {
-				continue
-			}
-			snapsWithTime = append(snapsWithTime, snapshotWithTime{snapshot: snap, time: t})
-		}
-
-		sort.Slice(snapsWithTime, func(i, j int) bool {
-			return snapsWithTime[i].time.Before(snapsWithTime[j].time)
-		})
-
-		// Check each retention policy
-		policies := []struct {
-			name    string
-			keep    int
-			groupBy func(time.Time) string
-		}{
-			{"hourly", a.config.KeepHourly, func(t time.Time) string {
-				return fmt.Sprintf("%d-%02d-%02d-%02d", t.Year(), t.Month(), t.Day(), t.Hour())
-			}},
-			{"daily", a.config.KeepDaily, func(t time.Time) string {
-				return fmt.Sprintf("%d-%02d-%02d", t.Year(), t.Month(), t.Day())
-			}},
-			{"weekly", a.config.KeepWeekly, func(t time.Time) string {
-				// Start week on Monday
-				weekStart := t.AddDate(0, 0, -int(t.Weekday()-time.Monday+7)%7)
-				return fmt.Sprintf("%d-%02d-%02d", weekStart.Year(), weekStart.Month(), weekStart.Day())
-			}},
-			{"monthly", a.config.KeepMonthly, func(t time.Time) string {
-				return fmt.Sprintf("%d-%02d", t.Year(), t.Month())
-			}},
-			{"yearly", a.config.KeepYearly, func(t time.Time) string {
-				return fmt.Sprintf("%d", t.Year())
-			}},
-		}
-
-		for _, policy := range policies {
-			if policy.keep == 0 {
-				continue
-			}
-
-			// Group snapshots by time bucket
-			buckets := make(map[string][]snapshotWithTime)
-			for _, snap := range snapsWithTime {
-				bucket := policy.groupBy(snap.time)
-				buckets[bucket] = append(buckets[bucket], snap)
-			}
-
-			// Count buckets with snapshots
-			bucketCount := len(buckets)
-
-			if bucketCount > policy.keep {
-				violations = append(violations, AuditCheckResult{
-					CheckType: "retention_" + policy.name,
-					Path:      path,
-					Message:   fmt.Sprintf("too many %s snapshots: %d > %d", policy.name, bucketCount, policy.keep),
-					Details: map[string]string{
-						"policy":      policy.name,
-						"actual":      strconv.Itoa(bucketCount),
-						"expected":    strconv.Itoa(policy.keep),
-						"total_snaps": strconv.Itoa(len(snapsWithTime)),
-					},
-				})
-			}
-		}
-	}
-
-	return violations
-}
-
 func (a *AuditAction) sendAuditEmail(failedChecks []AuditCheckResult, dryRun bool) error {
 	subject := "Audit Report: FAILURES DETECTED"
 	body := a.generateAuditEmailBody(failedChecks)
@@ -328,16 +229,14 @@ func (a *AuditAction) generateAuditEmailBody(failedChecks []AuditCheckResult) st
 
 func NewAuditCmd() *cobra.Command {
 	var growThreshold, shrinkThreshold float64
-	var keepHourly, keepDaily, keepWeekly, keepMonthly, keepYearly int
 	var smtpHost, smtpUsername, smtpPassword, from, to string
 	var smtpPort int
 
 	cmd := &cobra.Command{
 		Use:   "audit [log-directory]",
-		Short: "Audit snapshots for anomalies and retention policy compliance",
-		Long: `Audit restic snapshots for size anomalies and retention policy compliance.
-Checks for unusual size changes between snapshots and verifies snapshot counts
-against retention policies. Sends email notifications for any failures.`,
+		Short: "Audit snapshots for size anomalies",
+		Long: `Audit restic snapshots for size anomalies.
+Checks for unusual size changes between snapshots. Sends email notifications for any failures.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var emailConfig *shared.NotifyEmailConfig
@@ -355,11 +254,6 @@ against retention policies. Sends email notifications for any failures.`,
 			auditConfig := &AuditConfig{
 				GrowThreshold:     growThreshold,
 				ShrinkThreshold:   shrinkThreshold,
-				KeepHourly:        keepHourly,
-				KeepDaily:         keepDaily,
-				KeepWeekly:        keepWeekly,
-				KeepMonthly:       keepMonthly,
-				KeepYearly:        keepYearly,
 				NotifyEmailConfig: emailConfig,
 			}
 
@@ -376,11 +270,6 @@ against retention policies. Sends email notifications for any failures.`,
 
 	cmd.Flags().Float64Var(&growThreshold, "grow-threshold", 20.0, "Maximum allowed growth percentage between snapshots")
 	cmd.Flags().Float64Var(&shrinkThreshold, "shrink-threshold", 5.0, "Maximum allowed shrink percentage between snapshots")
-	cmd.Flags().IntVar(&keepHourly, "keep-hourly", 0, "Number of hourly snapshots to keep")
-	cmd.Flags().IntVar(&keepDaily, "keep-daily", 0, "Number of daily snapshots to keep")
-	cmd.Flags().IntVar(&keepWeekly, "keep-weekly", 0, "Number of weekly snapshots to keep")
-	cmd.Flags().IntVar(&keepMonthly, "keep-monthly", 0, "Number of monthly snapshots to keep")
-	cmd.Flags().IntVar(&keepYearly, "keep-yearly", 0, "Number of yearly snapshots to keep")
 
 	// Email flags (optional)
 	cmd.Flags().StringVar(&smtpHost, "smtp-host", "", "SMTP server hostname")

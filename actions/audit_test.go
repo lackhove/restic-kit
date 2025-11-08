@@ -3,6 +3,9 @@ package actions
 import (
 	"testing"
 	"time"
+
+	"restic-kit/restic"
+	"restic-kit/shared"
 )
 
 func TestValidateAuditConfig(t *testing.T) {

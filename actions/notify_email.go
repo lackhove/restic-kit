@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,247 +10,16 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	gomail "gopkg.in/gomail.v2"
+	"restic-kit/restic"
+	"restic-kit/shared"
 )
-
-// NotifyEmailConfig holds configuration for email notifications
-type NotifyEmailConfig struct {
-	SMTPHost     string
-	SMTPPort     int
-	SMTPUsername string
-	SMTPPassword string
-	From         string
-	To           string
-}
-
-// ValidateNotifyEmailConfig validates the email notification config
-func ValidateNotifyEmailConfig(cfg *NotifyEmailConfig) error {
-	if cfg.SMTPHost == "" {
-		return fmt.Errorf("smtp-host is required")
-	}
-	if cfg.SMTPPort == 0 {
-		cfg.SMTPPort = 587
-	}
-	if cfg.From == "" {
-		return fmt.Errorf("from is required")
-	}
-	if cfg.To == "" {
-		return fmt.Errorf("to is required")
-	}
-	if cfg.SMTPUsername == "" {
-		return fmt.Errorf("smtp-username is required")
-	}
-	if cfg.SMTPPassword == "" {
-		return fmt.Errorf("smtp-password is required")
-	}
-	return nil
-}
-
-type ResticMessage struct {
-	MessageType string `json:"message_type"`
-	// For summary
-	FilesNew            int     `json:"files_new,omitempty"`
-	FilesChanged        int     `json:"files_changed,omitempty"`
-	FilesUnmodified     int     `json:"files_unmodified,omitempty"`
-	DirsNew             int     `json:"dirs_new,omitempty"`
-	DirsChanged         int     `json:"dirs_changed,omitempty"`
-	DirsUnmodified      int     `json:"dirs_unmodified,omitempty"`
-	DataBlobs           int     `json:"data_blobs,omitempty"`
-	TreeBlobs           int     `json:"tree_blobs,omitempty"`
-	DataAdded           int64   `json:"data_added,omitempty"`
-	DataAddedPacked     int64   `json:"data_added_packed,omitempty"`
-	TotalFilesProcessed int     `json:"total_files_processed,omitempty"`
-	TotalBytesProcessed int64   `json:"total_bytes_processed,omitempty"`
-	TotalDuration       float64 `json:"total_duration,omitempty"`
-	SnapshotID          string  `json:"snapshot_id,omitempty"`
-	// For check summary
-	NumErrors int `json:"num_errors,omitempty"`
-	// For status
-	Message string `json:"message,omitempty"`
-	// For snapshots
-	Snapshots []SnapshotGroup `json:"snapshots,omitempty"`
-}
-
-type SnapshotGroup struct {
-	GroupKey  GroupKey   `json:"group_key"`
-	Snapshots []Snapshot `json:"snapshots"`
-}
-
-type GroupKey struct {
-	Hostname string   `json:"hostname"`
-	Paths    []string `json:"paths"`
-	Tags     []string `json:"tags"`
-}
-
-type Snapshot struct {
-	Time    string        `json:"time"`
-	Parent  string        `json:"parent"`
-	Tree    string        `json:"tree"`
-	Paths   []string      `json:"paths"`
-	Summary BackupSummary `json:"summary"`
-	ID      string        `json:"id"`
-}
-
-type BackupSummary struct {
-	BackupStart         string `json:"backup_start"`
-	BackupEnd           string `json:"backup_end"`
-	FilesNew            int    `json:"files_new"`
-	FilesChanged        int    `json:"files_changed"`
-	FilesUnmodified     int    `json:"files_unmodified"`
-	DirsNew             int    `json:"dirs_new"`
-	DirsChanged         int    `json:"dirs_changed"`
-	DirsUnmodified      int    `json:"dirs_unmodified"`
-	DataBlobs           int    `json:"data_blobs"`
-	TreeBlobs           int    `json:"tree_blobs"`
-	DataAdded           int64  `json:"data_added"`
-	DataAddedPacked     int64  `json:"data_added_packed"`
-	TotalFilesProcessed int    `json:"total_files_processed"`
-	TotalBytesProcessed int64  `json:"total_bytes_processed"`
-}
-
-type ActionResult interface {
-	GetActionName() string
-	IsSuccess() bool
-	GetSummaryInfo() map[string]string
-	GetOutFile() string
-	GetErrFile() string
-}
-
-type BackupResult struct {
-	FilesNew            int     `json:"files_new,omitempty"`
-	FilesChanged        int     `json:"files_changed,omitempty"`
-	FilesUnmodified     int     `json:"files_unmodified,omitempty"`
-	DirsNew             int     `json:"dirs_new,omitempty"`
-	DirsChanged         int     `json:"dirs_changed,omitempty"`
-	DirsUnmodified      int     `json:"dirs_unmodified,omitempty"`
-	DataAdded           int64   `json:"data_added,omitempty"`
-	DataAddedPacked     int64   `json:"data_added_packed,omitempty"`
-	TotalFilesProcessed int     `json:"total_files_processed,omitempty"`
-	TotalBytesProcessed int64   `json:"total_bytes_processed,omitempty"`
-	TotalDuration       float64 `json:"total_duration,omitempty"`
-}
-
-type BackupActionResult struct {
-	Name    string
-	Success bool
-	Result  *BackupResult
-	OutFile string
-	ErrFile string
-}
-
-func (r *BackupActionResult) GetActionName() string {
-	return r.Name
-}
-
-func (r *BackupActionResult) IsSuccess() bool {
-	return r.Success
-}
-
-func (r *BackupActionResult) GetSummaryInfo() map[string]string {
-	info := make(map[string]string)
-	if r.Result != nil {
-		info["files_new"] = fmt.Sprintf("%d", r.Result.FilesNew)
-		info["files_changed"] = fmt.Sprintf("%d", r.Result.FilesChanged)
-		info["files_unmodified"] = fmt.Sprintf("%d", r.Result.FilesUnmodified)
-		info["dirs_new"] = fmt.Sprintf("%d", r.Result.DirsNew)
-		info["dirs_changed"] = fmt.Sprintf("%d", r.Result.DirsChanged)
-		info["dirs_unmodified"] = fmt.Sprintf("%d", r.Result.DirsUnmodified)
-		info["data_added"] = formatBytes(r.Result.DataAdded)
-		info["data_added_packed"] = formatBytes(r.Result.DataAddedPacked)
-		info["total_files_processed"] = fmt.Sprintf("%d", r.Result.TotalFilesProcessed)
-		info["total_bytes_processed"] = formatBytes(r.Result.TotalBytesProcessed)
-		if r.Result.TotalDuration > 0 {
-			info["duration"] = fmt.Sprintf("%.2f", r.Result.TotalDuration)
-		}
-	}
-	return info
-}
-
-func (r *BackupActionResult) GetOutFile() string {
-	return r.OutFile
-}
-
-func (r *BackupActionResult) GetErrFile() string {
-	return r.ErrFile
-}
-
-type CheckResult struct {
-	NumErrors int `json:"num_errors,omitempty"`
-}
-
-type CheckActionResult struct {
-	Name    string
-	Success bool
-	Result  *CheckResult
-	OutFile string
-	ErrFile string
-}
-
-func (r *CheckActionResult) GetActionName() string {
-	return r.Name
-}
-
-func (r *CheckActionResult) IsSuccess() bool {
-	return r.Success
-}
-
-func (r *CheckActionResult) GetSummaryInfo() map[string]string {
-	info := make(map[string]string)
-	if r.Result != nil {
-		info["num_errors"] = fmt.Sprintf("%d", r.Result.NumErrors)
-		if r.Result.NumErrors == 0 {
-			info["status"] = "PASSED"
-		} else {
-			info["status"] = "FAILED"
-		}
-	}
-	return info
-}
-
-func (r *CheckActionResult) GetOutFile() string {
-	return r.OutFile
-}
-
-func (r *CheckActionResult) GetErrFile() string {
-	return r.ErrFile
-}
-
-type SnapshotsActionResult struct {
-	Name      string
-	Success   bool
-	Snapshots []Snapshot
-	OutFile   string
-	ErrFile   string
-}
-
-func (r *SnapshotsActionResult) GetActionName() string {
-	return r.Name
-}
-
-func (r *SnapshotsActionResult) IsSuccess() bool {
-	return r.Success
-}
-
-func (r *SnapshotsActionResult) GetSummaryInfo() map[string]string {
-	info := make(map[string]string)
-	info["total_snapshots"] = fmt.Sprintf("%d", len(r.Snapshots))
-	return info
-}
-
-func (r *SnapshotsActionResult) GetOutFile() string {
-	return r.OutFile
-}
-
-func (r *SnapshotsActionResult) GetErrFile() string {
-	return r.ErrFile
-}
 
 type NotifyEmailAction struct {
 	*BaseAction
-	config *NotifyEmailConfig
+	config *shared.NotifyEmailConfig
 }
 
-func NewNotifyEmailAction(cfg *NotifyEmailConfig) *NotifyEmailAction {
+func NewNotifyEmailAction(cfg *shared.NotifyEmailConfig) *NotifyEmailAction {
 	return &NotifyEmailAction{
 		BaseAction: NewBaseAction("notify-email"),
 		config:     cfg,
@@ -280,13 +48,8 @@ func (a *NotifyEmailAction) Execute(args []string, dryRun bool) error {
 		return nil
 	}
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", a.config.From)
-	m.SetHeader("To", a.config.To)
-	m.SetHeader("Subject", subject)
-	m.SetBody("text/plain", body)
-
 	// Attach log files from action results
+	var attachments []string
 	for _, action := range actions {
 		if action.IsSuccess() {
 			continue
@@ -297,19 +60,17 @@ func (a *NotifyEmailAction) Execute(args []string, dryRun bool) error {
 
 		if outFile != "" {
 			if _, err := os.Stat(outFile); err == nil {
-				m.Attach(outFile)
+				attachments = append(attachments, outFile)
 			}
 		}
 		if errFile != "" {
 			if _, err := os.Stat(errFile); err == nil {
-				m.Attach(errFile)
+				attachments = append(attachments, errFile)
 			}
 		}
 	}
 
-	d := gomail.NewDialer(a.config.SMTPHost, a.config.SMTPPort, a.config.SMTPUsername, a.config.SMTPPassword)
-
-	if err := d.DialAndSend(m); err != nil {
+	if err := shared.SendEmail(a.config, subject, body, attachments, dryRun); err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
 
@@ -317,122 +78,22 @@ func (a *NotifyEmailAction) Execute(args []string, dryRun bool) error {
 	return nil
 }
 
-func readExitCode(exitcodeFile string) (int, error) {
-	content, err := os.ReadFile(exitcodeFile)
-	if err != nil {
-		return -1, err
-	}
-	code, err := strconv.Atoi(strings.TrimSpace(string(content)))
-	if err != nil {
-		return -1, fmt.Errorf("invalid exit code in %s: %w", exitcodeFile, err)
-	}
-	return code, nil
-}
-
-func determineActionType(exitcodeFile string) (string, string) {
-	base := filepath.Base(exitcodeFile)
-	base = strings.TrimSuffix(base, ".exitcode")
-
-	if strings.HasPrefix(base, "backup.") {
-		actionName := strings.TrimPrefix(base, "backup.")
-		return "backup", actionName
-	} else if base == "check" {
-		return "check", base
-	} else if base == "snapshots" {
-		return "snapshots", base
-	}
-	return "unknown", base
-}
-
-func parseBackupOutput(content string, success bool) (*BackupResult, error) {
-	lines := strings.Split(content, "\n")
-	var lastLine string
-
-	// Find the last non-empty line (summary is always on the last line)
-	for i := len(lines) - 1; i >= 0; i-- {
-		line := strings.TrimSpace(lines[i])
-		if line != "" {
-			lastLine = line
-			break
-		}
-	}
-
-	if lastLine == "" {
-		return &BackupResult{}, nil
-	}
-
-	var msg ResticMessage
-	if err := json.Unmarshal([]byte(lastLine), &msg); err != nil {
-		return nil, fmt.Errorf("failed to parse backup summary JSON: %w", err)
-	}
-
-	result := &BackupResult{
-		FilesNew:            msg.FilesNew,
-		FilesChanged:        msg.FilesChanged,
-		FilesUnmodified:     msg.FilesUnmodified,
-		DirsNew:             msg.DirsNew,
-		DirsChanged:         msg.DirsChanged,
-		DirsUnmodified:      msg.DirsUnmodified,
-		DataAdded:           msg.DataAdded,
-		DataAddedPacked:     msg.DataAddedPacked,
-		TotalFilesProcessed: msg.TotalFilesProcessed,
-		TotalBytesProcessed: msg.TotalBytesProcessed,
-		TotalDuration:       msg.TotalDuration,
-	}
-
-	return result, nil
-}
-
-func parseCheckOutput(content string, success bool) (*CheckResult, error) {
-	var msg ResticMessage
-	if err := json.Unmarshal([]byte(content), &msg); err != nil {
-		return nil, fmt.Errorf("failed to parse check output as JSON: %w", err)
-	}
-
-	result := &CheckResult{
-		NumErrors: msg.NumErrors,
-	}
-	return result, nil
-}
-
-func parseSnapshotsOutput(content string) ([]Snapshot, error) {
-	var snapshotGroups []SnapshotGroup
-	if err := json.Unmarshal([]byte(content), &snapshotGroups); err != nil {
-		return nil, fmt.Errorf("failed to parse snapshots output as JSON: %w", err)
-	}
-
-	var snapshots []Snapshot
-	for _, group := range snapshotGroups {
-		snapshots = append(snapshots, group.Snapshots...)
-	}
-	return snapshots, nil
-}
-
-func determineOverallSuccessFromActions(actions []ActionResult) bool {
-	for _, action := range actions {
-		if !action.IsSuccess() {
-			return false
-		}
-	}
-	return true
-}
-
-func generateBodyFromActions(actions []ActionResult, success bool) string {
+func generateBodyFromActions(actions []restic.ActionResult, success bool) string {
 	var body strings.Builder
 
 	body.WriteString(fmt.Sprintf("Overall Status: %s\n\n", map[bool]string{true: "SUCCESS", false: "FAILURE"}[success]))
 
-	var backupActions []ActionResult
-	var checkActions []ActionResult
-	var allSnapshots []Snapshot
+	var backupActions []restic.ActionResult
+	var checkActions []restic.ActionResult
+	var allSnapshots []restic.Snapshot
 
 	for _, action := range actions {
 		switch actionResult := action.(type) {
-		case *BackupActionResult:
+		case *restic.BackupActionResult:
 			backupActions = append(backupActions, action)
-		case *CheckActionResult:
+		case *restic.CheckActionResult:
 			checkActions = append(checkActions, action)
-		case *SnapshotsActionResult:
+		case *restic.SnapshotsActionResult:
 			allSnapshots = append(allSnapshots, actionResult.Snapshots...)
 		}
 	}
@@ -440,7 +101,7 @@ func generateBodyFromActions(actions []ActionResult, success bool) string {
 	if len(backupActions) > 0 {
 		body.WriteString("Backup Summaries:\n")
 		for _, action := range backupActions {
-			result := action.(*BackupActionResult)
+			result := action.(*restic.BackupActionResult)
 			statusEmoji := "✅"
 			if !result.Success {
 				statusEmoji = "❌"
@@ -465,7 +126,7 @@ func generateBodyFromActions(actions []ActionResult, success bool) string {
 	if len(checkActions) > 0 {
 		body.WriteString("\nRepository Check:\n")
 		for _, action := range checkActions {
-			result := action.(*CheckActionResult)
+			result := action.(*restic.CheckActionResult)
 			statusEmoji := "✅"
 			if !result.Success {
 				statusEmoji = "❌"
@@ -479,7 +140,7 @@ func generateBodyFromActions(actions []ActionResult, success bool) string {
 		body.WriteString("\n\nRepository Snapshots:\n")
 		body.WriteString(fmt.Sprintf("Total snapshots: %d\n\n", len(allSnapshots)))
 
-		groupedByPath := make(map[string][]Snapshot)
+		groupedByPath := make(map[string][]restic.Snapshot)
 		for _, snap := range allSnapshots {
 			key := strings.Join(snap.Paths, ", ")
 			groupedByPath[key] = append(groupedByPath[key], snap)
@@ -513,8 +174,8 @@ func generateBodyFromActions(actions []ActionResult, success bool) string {
 					snap.Summary.FilesNew,
 					snap.Summary.FilesChanged,
 					snap.Summary.TotalFilesProcessed,
-					formatBytes(snap.Summary.DataAdded),
-					formatBytes(snap.Summary.TotalBytesProcessed)))
+					shared.FormatBytes(snap.Summary.DataAdded),
+					shared.FormatBytes(snap.Summary.TotalBytesProcessed)))
 			}
 			body.WriteString("\n")
 		}
@@ -523,28 +184,51 @@ func generateBodyFromActions(actions []ActionResult, success bool) string {
 	return body.String()
 }
 
-func formatBytes(bytes int64) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
+// analyzeBackupResults analyzes the backup results from a log directory
+// Helper functions (these could be moved to restic package if needed elsewhere)
+func readExitCode(exitcodeFile string) (int, error) {
+	content, err := os.ReadFile(exitcodeFile)
+	if err != nil {
+		return -1, err
 	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
+	code, err := strconv.Atoi(strings.TrimSpace(string(content)))
+	if err != nil {
+		return -1, fmt.Errorf("invalid exit code in %s: %w", exitcodeFile, err)
 	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
+	return code, nil
 }
 
-// analyzeBackupResults analyzes the backup results from a log directory
-// and returns the actions, overall success status, and any error
-func analyzeBackupResults(logDir string) ([]ActionResult, bool, error) {
+func determineActionType(exitcodeFile string) (string, string) {
+	base := filepath.Base(exitcodeFile)
+	base = strings.TrimSuffix(base, ".exitcode")
+
+	if strings.HasPrefix(base, "backup.") {
+		actionName := strings.TrimPrefix(base, "backup.")
+		return "backup", actionName
+	} else if base == "check" {
+		return "check", base
+	} else if base == "snapshots" {
+		return "snapshots", base
+	}
+	return "unknown", base
+}
+
+func determineOverallSuccessFromActions(actions []restic.ActionResult) bool {
+	for _, action := range actions {
+		if !action.IsSuccess() {
+			return false
+		}
+	}
+	return true
+}
+
+func analyzeBackupResults(logDir string) ([]restic.ActionResult, bool, error) {
 	exitcodeFiles, err := filepath.Glob(filepath.Join(logDir, "*.exitcode"))
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to list exitcode files in %s: %w", logDir, err)
 	}
 
-	var actions []ActionResult
+	var actions []restic.ActionResult
 
 	for _, exitcodeFile := range exitcodeFiles {
 		actionType, actionName := determineActionType(exitcodeFile)
@@ -565,11 +249,11 @@ func analyzeBackupResults(logDir string) ([]ActionResult, bool, error) {
 
 		switch actionType {
 		case "backup":
-			result, err := parseBackupOutput(string(outContent), success)
+			result, err := restic.ParseBackupOutput(string(outContent), success)
 			if err != nil {
 				return nil, false, fmt.Errorf("failed to parse backup output for %s: %w", actionName, err)
 			}
-			actions = append(actions, &BackupActionResult{
+			actions = append(actions, &restic.BackupActionResult{
 				Name:    actionName,
 				Success: success,
 				Result:  result,
@@ -578,11 +262,11 @@ func analyzeBackupResults(logDir string) ([]ActionResult, bool, error) {
 			})
 
 		case "check":
-			result, err := parseCheckOutput(string(outContent), success)
+			result, err := restic.ParseCheckOutput(string(outContent), success)
 			if err != nil {
 				return nil, false, fmt.Errorf("failed to parse check output: %w", err)
 			}
-			actions = append(actions, &CheckActionResult{
+			actions = append(actions, &restic.CheckActionResult{
 				Name:    actionName,
 				Success: success,
 				Result:  result,
@@ -591,11 +275,11 @@ func analyzeBackupResults(logDir string) ([]ActionResult, bool, error) {
 			})
 
 		case "snapshots":
-			snapshots, err := parseSnapshotsOutput(string(outContent))
+			snapshots, err := restic.ParseSnapshotsOutput(string(outContent))
 			if err != nil {
 				return nil, false, fmt.Errorf("failed to parse snapshots output: %w", err)
 			}
-			actions = append(actions, &SnapshotsActionResult{
+			actions = append(actions, &restic.SnapshotsActionResult{
 				Name:      actionName,
 				Success:   success,
 				Snapshots: snapshots,
@@ -619,7 +303,7 @@ func NewNotifyEmailCmd() *cobra.Command {
 		Long:  `Send an email notification using the configured SMTP settings. Parses JSON logs from the specified directory and generates a summary.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			emailConfig := &NotifyEmailConfig{
+			emailConfig := &shared.NotifyEmailConfig{
 				SMTPHost:     smtpHost,
 				SMTPPort:     smtpPort,
 				SMTPUsername: smtpUsername,
@@ -628,7 +312,7 @@ func NewNotifyEmailCmd() *cobra.Command {
 				To:           to,
 			}
 
-			if err := ValidateNotifyEmailConfig(emailConfig); err != nil {
+			if err := shared.ValidateNotifyEmailConfig(emailConfig); err != nil {
 				return fmt.Errorf("invalid email config: %w", err)
 			}
 

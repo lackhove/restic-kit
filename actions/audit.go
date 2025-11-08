@@ -11,6 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 	gomail "gopkg.in/gomail.v2"
+	"restic-kit/restic"
+	"restic-kit/shared"
 )
 
 // AuditConfig holds configuration for audit checks
@@ -22,7 +24,7 @@ type AuditConfig struct {
 	KeepWeekly      int
 	KeepMonthly     int
 	KeepYearly      int
-	*NotifyEmailConfig
+	*shared.NotifyEmailConfig
 }
 
 // ValidateAuditConfig validates the audit config
@@ -34,7 +36,7 @@ func ValidateAuditConfig(cfg *AuditConfig) error {
 		return fmt.Errorf("shrink-threshold must be non-negative")
 	}
 	if cfg.NotifyEmailConfig != nil {
-		return ValidateNotifyEmailConfig(cfg.NotifyEmailConfig)
+		return shared.ValidateNotifyEmailConfig(cfg.NotifyEmailConfig)
 	}
 	return nil
 }
@@ -104,21 +106,21 @@ func (a *AuditAction) Execute(args []string, dryRun bool) error {
 	return nil
 }
 
-func (a *AuditAction) readSnapshots(logDir string) ([]Snapshot, error) {
+func (a *AuditAction) readSnapshots(logDir string) ([]restic.Snapshot, error) {
 	snapshotsFile := filepath.Join(logDir, "snapshots.out")
 	content, err := os.ReadFile(snapshotsFile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read snapshots file: %w", err)
 	}
 
-	return parseSnapshotsOutput(string(content))
+	return restic.ParseSnapshotsOutput(string(content))
 }
 
-func (a *AuditAction) checkSizeChanges(snapshots []Snapshot) []AuditCheckResult {
+func (a *AuditAction) checkSizeChanges(snapshots []restic.Snapshot) []AuditCheckResult {
 	var violations []AuditCheckResult
 
 	// Group snapshots by path
-	groupedByPath := make(map[string][]Snapshot)
+	groupedByPath := make(map[string][]restic.Snapshot)
 	for _, snap := range snapshots {
 		key := strings.Join(snap.Paths, ", ")
 		groupedByPath[key] = append(groupedByPath[key], snap)
@@ -163,8 +165,8 @@ func (a *AuditAction) checkSizeChanges(snapshots []Snapshot) []AuditCheckResult 
 				Path:      path,
 				Message:   fmt.Sprintf("%.1f%% change exceeds %.1f%% threshold", changePercent, threshold),
 				Details: map[string]string{
-					"previous_size":  formatBytes(prev.Summary.TotalBytesProcessed),
-					"current_size":   formatBytes(curr.Summary.TotalBytesProcessed),
+					"previous_size":  shared.FormatBytes(prev.Summary.TotalBytesProcessed),
+					"current_size":   shared.FormatBytes(curr.Summary.TotalBytesProcessed),
 					"change_percent": fmt.Sprintf("%.1f", changePercent),
 					"threshold":      fmt.Sprintf("%.1f", threshold),
 					"previous_time":  prev.Time,
@@ -177,11 +179,11 @@ func (a *AuditAction) checkSizeChanges(snapshots []Snapshot) []AuditCheckResult 
 	return violations
 }
 
-func (a *AuditAction) checkRetentionPolicy(snapshots []Snapshot) []AuditCheckResult {
+func (a *AuditAction) checkRetentionPolicy(snapshots []restic.Snapshot) []AuditCheckResult {
 	var violations []AuditCheckResult
 
 	// Group snapshots by path
-	groupedByPath := make(map[string][]Snapshot)
+	groupedByPath := make(map[string][]restic.Snapshot)
 	for _, snap := range snapshots {
 		key := strings.Join(snap.Paths, ", ")
 		groupedByPath[key] = append(groupedByPath[key], snap)
@@ -190,7 +192,7 @@ func (a *AuditAction) checkRetentionPolicy(snapshots []Snapshot) []AuditCheckRes
 	for path, snaps := range groupedByPath {
 		// Parse times and sort
 		type snapshotWithTime struct {
-			snapshot Snapshot
+			snapshot restic.Snapshot
 			time     time.Time
 		}
 
@@ -338,9 +340,9 @@ Checks for unusual size changes between snapshots and verifies snapshot counts
 against retention policies. Sends email notifications for any failures.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var emailConfig *NotifyEmailConfig
+			var emailConfig *shared.NotifyEmailConfig
 			if smtpHost != "" || smtpUsername != "" || smtpPassword != "" || from != "" || to != "" {
-				emailConfig = &NotifyEmailConfig{
+				emailConfig = &shared.NotifyEmailConfig{
 					SMTPHost:     smtpHost,
 					SMTPPort:     smtpPort,
 					SMTPUsername: smtpUsername,

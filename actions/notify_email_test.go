@@ -136,11 +136,10 @@ func TestNotifyEmailActionDryRun(t *testing.T) {
 		"DRY RUN: Would send email with subject: Backup Report: SUCCESS",
 		"DRY RUN: Email body preview:",
 		"Overall Status: SUCCESS",
-		"Backup Summaries:",
-		"✅ docker-confs:",
-		"✅ nextcloud_data:",
-		"Repository Snapshots:",
-		"Total snapshots: 1",
+		"✅ backup docker-confs",
+		"✅ backup nextcloud_data",
+		"✅ snapshots",
+		"Repository Snapshots: 1",
 	}
 
 	for _, expected := range expectedStrings {

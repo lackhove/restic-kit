@@ -76,6 +76,52 @@ func ParseSnapshotsOutput(content string) ([]Snapshot, error) {
 	return snapshots, nil
 }
 
+// ForgetGroup represents a group in forget output
+type ForgetGroup struct {
+	Tags    []string   `json:"tags"`
+	Host    string     `json:"host"`
+	Paths   []string   `json:"paths"`
+	Keep    []Snapshot `json:"keep"`
+	Remove  []Snapshot `json:"remove"`
+	Reasons []struct {
+		Snapshot Snapshot `json:"snapshot"`
+		Matches  []string `json:"matches"`
+	} `json:"reasons"`
+}
+
+// ParseForgetOutput parses forget JSON output and returns kept snapshots and removed count
+func ParseForgetOutput(content string) ([]Snapshot, int, error) {
+	// Find the JSON part (first line should be JSON)
+	lines := strings.Split(content, "\n")
+	var jsonContent string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "[") {
+			jsonContent = line
+			break
+		}
+	}
+
+	if jsonContent == "" {
+		return nil, 0, fmt.Errorf("no JSON content found in forget output")
+	}
+
+	var forgetGroups []ForgetGroup
+	if err := json.Unmarshal([]byte(jsonContent), &forgetGroups); err != nil {
+		return nil, 0, fmt.Errorf("failed to parse forget output as JSON: %w", err)
+	}
+
+	var keptSnapshots []Snapshot
+	removedCount := 0
+
+	for _, group := range forgetGroups {
+		keptSnapshots = append(keptSnapshots, group.Keep...)
+		removedCount += len(group.Remove)
+	}
+
+	return keptSnapshots, removedCount, nil
+}
+
 // readExitCode reads exit code from file
 func readExitCode(exitcodeFile string) (int, error) {
 	content, err := os.ReadFile(exitcodeFile)

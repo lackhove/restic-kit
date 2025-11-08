@@ -192,12 +192,13 @@ func generateBodyFromActions(actions []restic.ActionResult, success bool) string
 			if !result.Success {
 				statusEmoji = "❌"
 			}
-			statusText := "successful"
-			if !result.Success {
-				statusText = "failed"
+			if result.RemovedCount > 0 {
+				body.WriteString(fmt.Sprintf("%s %s: %d snapshots removed\n",
+					statusEmoji, result.Name, result.RemovedCount))
+			} else {
+				body.WriteString(fmt.Sprintf("%s %s: no snapshots removed\n",
+					statusEmoji, result.Name))
 			}
-			body.WriteString(fmt.Sprintf("%s %s: %s\n",
-				statusEmoji, result.Name, statusText))
 		}
 	}
 
@@ -310,11 +311,17 @@ func analyzeBackupResults(logDir string) ([]restic.ActionResult, bool, error) {
 			})
 
 		case "forget":
+			snapshots, removedCount, err := restic.ParseForgetOutput(string(outContent))
+			if err != nil {
+				return nil, false, fmt.Errorf("failed to parse forget output: %w", err)
+			}
 			actions = append(actions, &restic.ForgetActionResult{
-				Name:    actionName,
-				Success: success,
-				OutFile: outFile,
-				ErrFile: errFile,
+				Name:         actionName,
+				Success:      success,
+				Snapshots:    snapshots,
+				RemovedCount: removedCount,
+				OutFile:      outFile,
+				ErrFile:      errFile,
 			})
 		}
 	}

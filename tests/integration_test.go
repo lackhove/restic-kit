@@ -28,7 +28,7 @@ func TestCLINotifyHTTP(t *testing.T) {
 	os.WriteFile(filepath.Join(tmpDir, "backup.test.out"), []byte(`{"message_type":"summary","files_new":0,"files_changed":0,"files_unmodified":100}`), 0644)
 	os.WriteFile(filepath.Join(tmpDir, "check.out"), []byte(`{"message_type":"summary","num_errors":0}`), 0644)
 	os.WriteFile(filepath.Join(tmpDir, "snapshots.out"), []byte(`[]`), 0644)
-	os.WriteFile(filepath.Join(tmpDir, "forget.out"), []byte(`[]`), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "forget.out"), []byte(`[{"tags":null,"host":"","paths":["/test"],"keep":[],"remove":[]}]`), 0644)
 
 	// Create a test server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

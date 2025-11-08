@@ -220,10 +220,12 @@ func (r *SnapshotsActionResult) GetErrFile() string {
 
 // ForgetActionResult implements ActionResult for forget operations
 type ForgetActionResult struct {
-	Name    string
-	Success bool
-	OutFile string
-	ErrFile string
+	Name         string
+	Success      bool
+	Snapshots    []Snapshot
+	RemovedCount int
+	OutFile      string
+	ErrFile      string
 }
 
 func (r *ForgetActionResult) GetActionName() string {
@@ -236,11 +238,7 @@ func (r *ForgetActionResult) IsSuccess() bool {
 
 func (r *ForgetActionResult) GetSummaryInfo() map[string]string {
 	info := make(map[string]string)
-	status := "successful"
-	if !r.Success {
-		status = "failed"
-	}
-	info["status"] = status
+	info["removed_snapshots"] = fmt.Sprintf("%d", r.RemovedCount)
 	return info
 }
 

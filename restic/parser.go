@@ -101,6 +101,8 @@ func determineActionType(exitcodeFile string) (string, string) {
 		return "check", base
 	} else if base == "snapshots" {
 		return "snapshots", base
+	} else if base == "forget" {
+		return "forget", base
 	}
 	return "unknown", base
 }

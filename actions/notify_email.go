@@ -85,6 +85,7 @@ func generateBodyFromActions(actions []restic.ActionResult, success bool) string
 
 	var backupActions []restic.ActionResult
 	var checkActions []restic.ActionResult
+	var forgetActions []restic.ActionResult
 	var allSnapshots []restic.Snapshot
 
 	for _, action := range actions {
@@ -95,6 +96,8 @@ func generateBodyFromActions(actions []restic.ActionResult, success bool) string
 			checkActions = append(checkActions, action)
 		case *restic.SnapshotsActionResult:
 			allSnapshots = append(allSnapshots, actionResult.Snapshots...)
+		case *restic.ForgetActionResult:
+			forgetActions = append(forgetActions, action)
 		}
 	}
 
@@ -181,6 +184,23 @@ func generateBodyFromActions(actions []restic.ActionResult, success bool) string
 		}
 	}
 
+	if len(forgetActions) > 0 {
+		body.WriteString("\n\nForget Operations:\n")
+		for _, action := range forgetActions {
+			result := action.(*restic.ForgetActionResult)
+			statusEmoji := "✅"
+			if !result.Success {
+				statusEmoji = "❌"
+			}
+			statusText := "successful"
+			if !result.Success {
+				statusText = "failed"
+			}
+			body.WriteString(fmt.Sprintf("%s %s: %s\n",
+				statusEmoji, result.Name, statusText))
+		}
+	}
+
 	return body.String()
 }
 
@@ -209,6 +229,8 @@ func determineActionType(exitcodeFile string) (string, string) {
 		return "check", base
 	} else if base == "snapshots" {
 		return "snapshots", base
+	} else if base == "forget" {
+		return "forget", base
 	}
 	return "unknown", base
 }
@@ -285,6 +307,14 @@ func analyzeBackupResults(logDir string) ([]restic.ActionResult, bool, error) {
 				Snapshots: snapshots,
 				OutFile:   outFile,
 				ErrFile:   errFile,
+			})
+
+		case "forget":
+			actions = append(actions, &restic.ForgetActionResult{
+				Name:    actionName,
+				Success: success,
+				OutFile: outFile,
+				ErrFile: errFile,
 			})
 		}
 	}

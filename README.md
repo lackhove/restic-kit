@@ -32,6 +32,10 @@ Wait for network connectivity by checking if a URL is reachable with exponential
 
 Audit restic snapshots for size anomalies. Checks for unusual size changes between the two most recent snapshots per path. Sends email notifications for any failures.
 
+### forget
+
+Remove old snapshots according to retention policies. Shows remaining snapshots after cleanup operation. Sends email notifications for any failures.
+
 ## Remote Backup Execution
 
 This section describes how to set up secure remote backup execution where the backup script runs on a remote host but executes the actual backup via SSH on the source system.

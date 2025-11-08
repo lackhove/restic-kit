@@ -218,6 +218,40 @@ func (r *SnapshotsActionResult) GetErrFile() string {
 	return r.ErrFile
 }
 
+// ForgetActionResult implements ActionResult for forget operations
+type ForgetActionResult struct {
+	Name    string
+	Success bool
+	OutFile string
+	ErrFile string
+}
+
+func (r *ForgetActionResult) GetActionName() string {
+	return r.Name
+}
+
+func (r *ForgetActionResult) IsSuccess() bool {
+	return r.Success
+}
+
+func (r *ForgetActionResult) GetSummaryInfo() map[string]string {
+	info := make(map[string]string)
+	status := "successful"
+	if !r.Success {
+		status = "failed"
+	}
+	info["status"] = status
+	return info
+}
+
+func (r *ForgetActionResult) GetOutFile() string {
+	return r.OutFile
+}
+
+func (r *ForgetActionResult) GetErrFile() string {
+	return r.ErrFile
+}
+
 // formatBytes formats bytes into human readable format
 func formatBytes(bytes int64) string {
 	const unit = 1024

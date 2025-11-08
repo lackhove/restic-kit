@@ -82,6 +82,18 @@ $REMOTE_RESTIC backup \
 " 2> >(tee "$TEMP_DIR/backup.etc.err" >&2) | tee "$TEMP_DIR/backup.etc.out"
 echo $? > "$TEMP_DIR/backup.etc.exitcode"
 
+# Clean up repository using retention policy
+echo "Cleaning up repository..."
+$RESTIC forget \
+    --keep-daily=7 \
+    --keep-monthly=12 \
+    --keep-weekly=8 \
+    --keep-yearly=10 \
+    --group-by=paths \
+    --prune \
+    --json > "$TEMP_DIR/forget.out" 2> "$TEMP_DIR/forget.err"
+echo $? > "$TEMP_DIR/forget.exitcode"
+
 # Check repository consistency
 echo "Checking repository consistency..."
 $RESTIC check \

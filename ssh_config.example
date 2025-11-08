@@ -1,0 +1,13 @@
+# SSH config for secure credential forwarding
+# Place this in ~/.ssh/config on the REMOTE host
+# This allows RESTIC_*, B2_*, and AWS_* environment variables to be forwarded to specific hosts
+
+Host backup-source
+    HostName source.example.com
+    User backupuser
+    IdentityFile ~/.ssh/backup_id_rsa
+    # Forward RESTIC_*, B2_*, and AWS_* environment variables only to this host
+    SendEnv RESTIC_*
+    SendEnv B2_*
+    SendEnv AWS_*
+    # Only applies to connections to backup-source host

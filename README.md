@@ -111,6 +111,140 @@ The command performs two types of checks:
 
 If any checks fail and email configuration is provided, a detailed email report is sent with violation details.
 
+## Remote Backup Execution
+
+This section describes how to set up secure remote backup execution where the backup script runs on a remote host but executes the actual backup via SSH on the source system.
+
+### Architecture
+
+- **Remote Host**: Runs the backup script, handles notifications, repository checks
+- **Source Host**: Only executes the `restic backup` command via SSH
+- **Security**: Credentials forwarded via SSH SendEnv (whitelist-only)
+
+### Setup Requirements
+
+#### 1. SSH Key Authentication
+
+Generate SSH key pair on remote host:
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/backup_id_rsa -C "backup-system"
+```
+
+Copy public key to source host:
+```bash
+ssh-copy-id -i ~/.ssh/backup_id_rsa.pub user@source.example.com
+```
+
+#### 2. SSH Configuration (on Remote Host)
+
+Create or modify `~/.ssh/config`:
+
+```bash
+Host backup-source
+    HostName source.example.com
+    User backupuser
+    IdentityFile ~/.ssh/backup_id_rsa
+    # Forward RESTIC_*, B2_*, and AWS_* environment variables only to this host
+    SendEnv RESTIC_*
+    SendEnv B2_*
+    SendEnv AWS_*
+    # Only applies to connections to backup-source host
+```
+
+#### 3. Configuration Variables
+
+Set these variables in the `backup.sh` script or as environment variables on the remote host:
+
+**Required Variables:**
+```bash
+RESTIC="/usr/local/bin/restic"           # Local restic path (for check/snapshots)
+REMOTE_RESTIC="/usr/local/bin/restic"    # Remote restic path (for backup on source)
+SSH_HOST="backup-source"                 # SSH config host alias
+SSH_PORT="22"                            # SSH port for source system
+```
+
+**Environment Variables:**
+```bash
+export RESTIC_REPOSITORY="s3:s3.us-west-002.backblazeb2.com/my-backup-bucket"
+export B2_ACCOUNT_ID="your_backblaze_account_id"
+export B2_ACCOUNT_KEY="your_backblaze_account_key"
+export RESTIC_PASSWORD="your_restic_repository_password"
+export RESTIC_HOOKS_EMAIL_PASSWORD="your_email_password"
+```
+
+#### 4. SSH Daemon Configuration (on Source Host)
+
+Ensure `/etc/ssh/sshd_config` includes explicit environment variable acceptance:
+```bash
+AcceptEnv RESTIC_REPOSITORY
+AcceptEnv RESTIC_PASSWORD
+AcceptEnv B2_ACCOUNT_ID
+AcceptEnv B2_ACCOUNT_KEY
+AcceptEnv AWS_ACCESS_KEY_ID
+AcceptEnv AWS_SECRET_ACCESS_KEY
+```
+
+Restart SSH service after changes:
+```bash
+sudo systemctl restart sshd
+```
+
+### Security Benefits
+
+1. **Explicit Whitelisting**: Only approved environment variables are forwarded
+2. **No Command-Line Exposure**: Credentials never appear in process arguments
+3. **SSH Encryption**: All credential transmission is encrypted
+4. **Minimal Attack Surface**: Only backup command runs on source system
+5. **Key-Based Authentication**: Strong authentication without passwords
+
+### Testing Remote Setup
+
+Use the provided test script to validate your remote backup setup:
+
+```bash
+./test_remote_setup.sh
+```
+
+Test the setup step by step:
+
+1. **SSH connectivity**:
+   ```bash
+   ssh backup-source "echo 'SSH works'"
+   ```
+
+2. **Environment forwarding**:
+   ```bash
+   export TEST_RESTIC_VAR="secret"
+   ssh -o SendEnv=TEST_RESTIC_VAR backup-source "echo \$TEST_RESTIC_VAR"
+   ```
+
+3. **Restic access**:
+   ```bash
+   ssh backup-source "restic version"
+   ```
+
+4. **Full backup test** (dry run):
+   ```bash
+   export RESTIC_PASSWORD="test"
+   ssh backup-source "restic backup --dry-run /etc"
+   ```
+
+### Troubleshooting
+
+- **"Environment variable not set"**: Check SSH config SendEnv and server AcceptEnv
+- **"Permission denied"**: Verify SSH key is properly installed
+- **"Command not found"**: Ensure restic is installed on source system
+- **"Repository access failed"**: Verify credentials are properly forwarded
+
+### Alternative Approaches
+
+If SendEnv is not feasible, consider:
+- SSH with here documents (credentials in script memory)
+- Base64 encoded credential bundles
+- Temporary credential files with automatic cleanup
+
+But SendEnv provides the best balance of security and usability.
+
 ## Restic Integration and Bash orchestration
 
 Use restic-kit in your restic backup commands. This repository contains a tiny, example Bash runner (`backup.sh`) that demonstrates how to combine the provided helpers and the CLI into simple, repeatable backup flows. The scripts are intentionally minimal so you can adapt them to your environment.

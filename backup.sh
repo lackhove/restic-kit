@@ -2,16 +2,29 @@
 
 set -euo pipefail
 
-# Restic backup script for 'etc' profile
-# Safely executes initialization, check, backup, and cleanup commands
+# Restic backup script for 'etc' profile - Remote Execution Version
+# Runs on remote host, executes backup via SSH on source system
+# Safely executes check, snapshots, notifications, and cleanup commands
 # Outputs JSON logs to temporary directory
+#
+# Security: Uses SSH SendEnv to forward RESTIC_*, B2_*, and AWS_* environment variables
+# containing credentials. SSH config must include SendEnv directives.
 
 # Configuration variables
 RESTIC="/usr/local/bin/restic"
+REMOTE_RESTIC="/usr/local/bin/restic"  # Path to restic on source system
 RESTIC_HOOKS="/usr/local/bin/restic-kit"
 RESTIC_REPOSITORY="s3:s3.us-west-002.backblazeb2.com/my-backup-bucket"
+SSH_HOST="backup-source"  # SSH config host alias for source system
+SSH_PORT="22"  # SSH port for source system
 
+# Export repository and credentials for SSH forwarding
 export RESTIC_REPOSITORY
+export B2_ACCOUNT_ID="${B2_ACCOUNT_ID:-}"
+export B2_ACCOUNT_KEY="${B2_ACCOUNT_KEY:-}"
+export RESTIC_PASSWORD="${RESTIC_PASSWORD:-}"
+export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-}"
+export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-}"
 
 # Create temporary directory for logs
 TEMP_DIR=$(mktemp -d)
@@ -39,14 +52,16 @@ cleanup() {
 trap cleanup EXIT
 
 
-# Perform backup
-echo "Starting backup for etc..."
-$RESTIC backup \
+# Perform backup via SSH on source system
+echo "Starting backup for etc on source system via SSH..."
+ssh -p "$SSH_PORT" "$SSH_HOST" "
+$REMOTE_RESTIC backup \
     --exclude=/etc/foobar \
     --one-file-system \
     --verbose=2 \
     --json \
-    /etc 2> >(tee "$TEMP_DIR/backup.etc.err" >&2) | tee "$TEMP_DIR/backup.etc.out"
+    /etc
+" 2> >(tee "$TEMP_DIR/backup.etc.err" >&2) | tee "$TEMP_DIR/backup.etc.out"
 echo $? > "$TEMP_DIR/backup.etc.exitcode"
 
 # Check repository consistency

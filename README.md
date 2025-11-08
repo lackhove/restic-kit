@@ -79,11 +79,13 @@ Set these variables in the `backup.sh` script or as environment variables on the
 
 **Required Variables:**
 ```bash
-RESTIC="/usr/local/bin/restic"           # Local restic path (for check/snapshots)
-REMOTE_RESTIC="/usr/local/bin/restic"    # Remote restic path (for backup on source)
-SSH_HOST="backup-source"                 # SSH config host alias
-SSH_PORT="22"                            # SSH port for source system
+RESTIC="/usr/local/bin/restic"                    # Local restic path (for check/snapshots)
+REMOTE_RESTIC_SRC="/usr/local/bin/restic"         # Path to restic binary on remote host (copied to source)
+SSH_HOST="backup-source"                          # SSH config host alias
+SSH_PORT="22"                                     # SSH port for source system
 ```
+
+**Note:** `REMOTE_RESTIC_SRC` specifies the restic binary on the remote host that gets copied to the source system. This allows the remote and source hosts to have different architectures (e.g., x86 remote host backing up ARM source systems).
 
 **Environment Variables:**
 ```bash
